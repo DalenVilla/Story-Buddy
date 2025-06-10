@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:story_buddy/screens/StudentDashboard.dart';
+import 'package:story_buddy/screens/main_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,11 +11,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Story Buddy',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6B73FF)),
+        useMaterial3: true,
       ),
-      home:  StudentDashboard(),
+      home: const MainScreen(),
     );
   }
 }
