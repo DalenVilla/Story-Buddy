@@ -16,6 +16,7 @@ class _SignUpTeacherScreenState extends State<SignUpTeacherScreen> {
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
   bool _isLoading = false;
+  String _selectedPrefix = 'Mr.';
 
   @override
   void dispose() {
@@ -170,7 +171,80 @@ class _SignUpTeacherScreenState extends State<SignUpTeacherScreen> {
                       ),
                     ),
                     
-                    const SizedBox(height: 48),
+                    const SizedBox(height: 32),
+                    
+                    // Google Sign Up Button (moved to top)
+                    Container(
+                      width: double.infinity,
+                      height: 56,
+                      child: OutlinedButton.icon(
+                        onPressed: _isLoading ? null : _handleGoogleSignUp,
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.grey[700],
+                          side: BorderSide(color: Colors.grey[300]!, width: 1.5),
+                          elevation: 0,
+                          shadowColor: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        icon: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Image.network(
+                            'https://developers.google.com/identity/images/g-logo.png',
+                            width: 20,
+                            height: 20,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(Icons.email_outlined, size: 20, color: Colors.grey[600]);
+                            },
+                          ),
+                        ),
+                        label: const Text(
+                          'Continue with Google',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 32),
+                    
+                    // Divider
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 1,
+                            color: Colors.grey[300],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Text(
+                            'or sign up with email',
+                            style: TextStyle(
+                              color: Colors.grey[500],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            height: 1,
+                            color: Colors.grey[300],
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    const SizedBox(height: 32),
                     
                     // Form Container
                     Container(
@@ -190,6 +264,67 @@ class _SignUpTeacherScreenState extends State<SignUpTeacherScreen> {
                         key: _formKey,
                         child: Column(
                           children: [
+                            // Prefix Selection
+                            Container(
+                              width: double.infinity,
+                              child: DropdownButtonFormField<String>(
+                                value: _selectedPrefix,
+                                decoration: InputDecoration(
+                                  labelText: 'Title/Prefix',
+                                  labelStyle: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  floatingLabelStyle: const TextStyle(
+                                    color: Color(0xFF6B73FF),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.grey[50],
+                                  prefixIcon: Icon(
+                                    Icons.person_outlined,
+                                    color: Colors.grey[500],
+                                    size: 20,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[200]!,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    borderSide: const BorderSide(
+                                      color: Color(0xFF6B73FF),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 20,
+                                  ),
+                                ),
+                                items: ['Mr.', 'Mrs.', 'Ms.', 'Dr.'].map((String prefix) {
+                                  return DropdownMenuItem<String>(
+                                    value: prefix,
+                                    child: Text(prefix),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    _selectedPrefix = newValue!;
+                                  });
+                                },
+                              ),
+                            ),
+                            
+                            const SizedBox(height: 28),
+                            
                             // First Name and Last Name
                             Row(
                               children: [
@@ -523,79 +658,7 @@ class _SignUpTeacherScreenState extends State<SignUpTeacherScreen> {
                         ),
                       ),
                     ),
-                    
-                    const SizedBox(height: 32),
-                    
-                    // Divider
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            height: 1,
-                            color: Colors.grey[300],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Text(
-                            'or',
-                            style: TextStyle(
-                              color: Colors.grey[500],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            height: 1,
-                            color: Colors.grey[300],
-                          ),
-                        ),
-                      ],
-                    ),
-                    
-                    const SizedBox(height: 32),
-                    
-                    // Google Sign Up Button
-                    Container(
-                      width: double.infinity,
-                      height: 56,
-                      child: OutlinedButton.icon(
-                        onPressed: _isLoading ? null : _handleGoogleSignUp,
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.grey[700],
-                          side: BorderSide(color: Colors.grey[300]!, width: 1.5),
-                          elevation: 0,
-                          shadowColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        icon: Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Image.network(
-                            'https://developers.google.com/identity/images/g-logo.png',
-                            width: 20,
-                            height: 20,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(Icons.email_outlined, size: 20, color: Colors.grey[600]);
-                            },
-                          ),
-                        ),
-                        label: const Text(
-                          'Continue with Google',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
+
                     
                     const SizedBox(height: 60),
                   ],
