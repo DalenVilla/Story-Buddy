@@ -22,18 +22,6 @@ class TeacherDashboardScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showCreateClassDialog(context),
-        backgroundColor: const Color(0xFF6B73FF),
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add),
-        label: const Text(
-          'Create Class',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -753,42 +741,7 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
           
           const SizedBox(height: 20),
           
-          DropdownButtonFormField<String>(
-            value: _selectedSubject,
-            decoration: InputDecoration(
-              labelText: 'Subject',
-              labelStyle: TextStyle(
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w500,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.grey[300]!),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(
-                  color: Color(0xFF6B73FF),
-                  width: 2,
-                ),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 16,
-              ),
-            ),
-            items: _subjects.map((String subject) {
-              return DropdownMenuItem<String>(
-                value: subject,
-                child: Text(subject),
-              );
-            }).toList(),
-            onChanged: (String? newValue) {
-              setState(() {
-                _selectedSubject = newValue!;
-              });
-            },
-          ),
+
         ],
       ),
     );

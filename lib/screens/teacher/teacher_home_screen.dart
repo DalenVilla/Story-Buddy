@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'teacher_dashboard_screen.dart';
 import 'teacher_classes_screen.dart';
+import 'teacher_actual_home_screen.dart';
 
 class TeacherHomeScreen extends StatefulWidget {
   const TeacherHomeScreen({super.key});
@@ -13,9 +14,14 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
   int _currentIndex = 0;
 
   List<Widget> get _screens => [
+    TeacherActualHomeScreen(onNavigate: (index) {
+      setState(() {
+        _currentIndex = index;
+      });
+    }),
     TeacherDashboardScreen(onNavigateToClasses: () {
       setState(() {
-        _currentIndex = 1; // Switch to Classes tab
+        _currentIndex = 2; // Switch to Classes tab
       });
     }),
     const TeacherClassesScreen(),
@@ -58,6 +64,11 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
             fontSize: 12,
           ),
           items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined, size: 24),
+              activeIcon: Icon(Icons.home, size: 24),
+              label: 'Home',
+            ),
             BottomNavigationBarItem(
               icon: Icon(Icons.dashboard_outlined, size: 24),
               activeIcon: Icon(Icons.dashboard, size: 24),
