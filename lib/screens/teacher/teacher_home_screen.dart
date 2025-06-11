@@ -12,8 +12,12 @@ class TeacherHomeScreen extends StatefulWidget {
 class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    const TeacherDashboardScreen(),
+  List<Widget> get _screens => [
+    TeacherDashboardScreen(onNavigateToClasses: () {
+      setState(() {
+        _currentIndex = 1; // Switch to Classes tab
+      });
+    }),
     const TeacherClassesScreen(),
     const PlaceholderScreen(title: 'Stories'),
     const PlaceholderScreen(title: 'Settings'),
