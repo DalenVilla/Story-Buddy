@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../student/student_home_screen.dart';
+import '../student/student_onboarding_screen.dart';
 
 class SignUpStudentScreen extends StatefulWidget {
   const SignUpStudentScreen({super.key});
@@ -36,12 +37,22 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
         _isLoading = false;
       });
 
-      // Navigate to student dashboard
+      // Navigate to onboarding screen
       if (!mounted) return;
+      
+      // Get the student's full name
+      final fullName = '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}';
+      
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const StorytimeHomeScreen(),
+          builder: (context) => StudentOnboardingScreen(
+            studentName: fullName,
+            className: 'Morning Reading', // This would come from the class code lookup
+            teacherName: 'Ms. Johnson',
+            grade: '3rd Grade',
+            classCode: _classCodeController.text.trim(),
+          ),
         ),
       );
     }

@@ -42,7 +42,7 @@ class StorytimeBottomNavBar extends StatelessWidget {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
-            label: 'Profile',
+            label: 'Me',
           ),
         ],
       ),
