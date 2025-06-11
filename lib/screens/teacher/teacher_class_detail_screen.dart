@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'view_all_students_screen.dart';
 
 class TeacherClassDetailScreen extends StatefulWidget {
   final String className;
@@ -365,7 +366,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
   }
 
   Widget _buildStudentList() {
-    final students = [
+    final allStudents = [
       {
         'name': 'Emma S.',
         'lastStory': 'The Brave Little Fox',
@@ -410,24 +411,81 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
       },
     ];
 
+    // Show only first 4 students
+    final displayStudents = allStudents.take(4).toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Student Progress',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF2D3436),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Students',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D3436),
+                  ),
+                ),
+                const SizedBox(height: 4),
+              ],
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ViewAllStudentsScreen(
+                      className: widget.className,
+                      grade: widget.grade,
+                      subject: widget.subject,
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6B73FF).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: const Color(0xFF6B73FF).withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'View All',
+                      style: TextStyle(
+                        color: const Color(0xFF6B73FF),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      color: const Color(0xFF6B73FF),
+                      size: 14,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: students.length,
+          itemCount: displayStudents.length,
           itemBuilder: (context, index) {
-            final student = students[index];
+            final student = displayStudents[index];
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.all(20),
