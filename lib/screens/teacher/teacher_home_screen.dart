@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'teacher_dashboard_screen.dart';
+import 'teacher_classes_screen.dart';
 
 class TeacherHomeScreen extends StatefulWidget {
   const TeacherHomeScreen({super.key});
@@ -13,7 +14,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
 
   final List<Widget> _screens = [
     const TeacherDashboardScreen(),
-    const PlaceholderScreen(title: 'Classes'),
+    const TeacherClassesScreen(),
     const PlaceholderScreen(title: 'Stories'),
     const PlaceholderScreen(title: 'Settings'),
   ];
