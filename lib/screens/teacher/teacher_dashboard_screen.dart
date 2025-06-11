@@ -83,6 +83,29 @@ class TeacherDashboardScreen extends StatelessWidget {
             
             const SizedBox(height: 32),
             
+            // Emotional Trends
+            const Text(
+              'Emotional Trends',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2D3436),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'This Week\'s Emotion Patterns',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            _buildEmotionalTrendsChart(),
+            
+            const SizedBox(height: 32),
+            
             // Quick Stats
             const Text(
               'Quick Overview',
@@ -291,6 +314,89 @@ class TeacherDashboardScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildEmotionalTrendsChart() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Legend
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildLegendItem('Joy', Colors.amber[600]!),
+              _buildLegendItem('Sadness', Colors.blue[600]!),
+              _buildLegendItem('Anxiety', Colors.red[600]!),
+              _buildLegendItem('Anger', Colors.orange[600]!),
+            ],
+          ),
+          
+          const SizedBox(height: 20),
+          
+          // Chart Area
+          SizedBox(
+            height: 120,
+            child: CustomPaint(
+              size: const Size(double.infinity, 120),
+              painter: EmotionalTrendsPainter(),
+            ),
+          ),
+          
+          const SizedBox(height: 12),
+          
+          // Days of the week labels
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: const [
+              Text('Mon', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              Text('Tue', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              Text('Wed', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              Text('Thu', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              Text('Fri', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              Text('Sat', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              Text('Sun', style: TextStyle(fontSize: 12, color: Colors.grey)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegendItem(String emotion, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          emotion,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF2D3436),
+          ),
+        ),
+      ],
     );
   }
 
@@ -1010,4 +1116,159 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
       ],
     );
   }
+}
+
+class EmotionalTrendsPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Sample data for emotions over the week (0-7 scale)
+    final Map<String, List<double>> emotionData = {
+      'Joy': [3.5, 4.2, 5.1, 6.0, 6.5, 5.8, 5.2],
+      'Sadness': [2.1, 2.8, 3.2, 2.5, 1.8, 2.1, 2.6],
+      'Anxiety': [4.8, 3.9, 4.5, 3.2, 2.8, 3.5, 3.1],
+      'Anger': [1.5, 2.1, 2.8, 3.5, 2.9, 2.2, 1.8],
+    };
+
+    final Map<String, Color> emotionColors = {
+      'Joy': const Color(0xFFFFC107),
+      'Sadness': const Color(0xFF2196F3),
+      'Anxiety': const Color(0xFFF44336),
+      'Anger': const Color(0xFFFF9800),
+    };
+
+    // Draw subtle grid lines
+    final gridPaint = Paint()
+      ..color = Colors.grey[200]!
+      ..strokeWidth = 0.5;
+
+    for (int i = 1; i <= 6; i++) {
+      final y = size.height - (i * size.height / 7);
+      canvas.drawLine(
+        Offset(20, y),
+        Offset(size.width - 10, y),
+        gridPaint,
+      );
+    }
+
+    // Draw Y-axis labels
+    final textPainter = TextPainter(
+      textDirection: TextDirection.ltr,
+    );
+
+    for (int i = 0; i <= 7; i++) {
+      final y = size.height - (i * size.height / 7);
+      textPainter.text = TextSpan(
+        text: i.toString(),
+        style: const TextStyle(
+          fontSize: 10,
+          color: Colors.grey,
+          fontWeight: FontWeight.w500,
+        ),
+      );
+      textPainter.layout();
+      textPainter.paint(canvas, Offset(5, y - 5));
+    }
+
+    // Draw emotion curves with gradient fills
+    emotionData.forEach((emotion, values) {
+      final color = emotionColors[emotion]!;
+      
+      // Create smooth curve path
+      final curvePath = _createSmoothCurve(values, size);
+      
+      // Draw gradient fill under the curve
+      final fillPath = Path.from(curvePath);
+      fillPath.lineTo(size.width - 10, size.height);
+      fillPath.lineTo(20, size.height);
+      fillPath.close();
+      
+      final gradientPaint = Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            color.withOpacity(0.3),
+            color.withOpacity(0.05),
+          ],
+        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+      
+      canvas.drawPath(fillPath, gradientPaint);
+      
+      // Draw the smooth curve line
+      final linePaint = Paint()
+        ..color = color
+        ..strokeWidth = 3.0
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round;
+      
+      canvas.drawPath(curvePath, linePaint);
+      
+      // Draw data points with glow effect
+      for (int i = 0; i < values.length; i++) {
+        final x = 20 + (i * (size.width - 30) / (values.length - 1));
+        final y = size.height - (values[i] * size.height / 7);
+        
+        // Glow effect
+        final glowPaint = Paint()
+          ..color = color.withOpacity(0.3)
+          ..style = PaintingStyle.fill;
+        canvas.drawCircle(Offset(x, y), 6, glowPaint);
+        
+        // Main point
+        final pointPaint = Paint()
+          ..color = Colors.white
+          ..style = PaintingStyle.fill;
+        canvas.drawCircle(Offset(x, y), 4, pointPaint);
+        
+        // Inner point
+        final innerPaint = Paint()
+          ..color = color
+          ..style = PaintingStyle.fill;
+        canvas.drawCircle(Offset(x, y), 2.5, innerPaint);
+      }
+    });
+  }
+
+  Path _createSmoothCurve(List<double> values, Size size) {
+    final path = Path();
+    final points = <Offset>[];
+    
+    // Convert data to points
+    for (int i = 0; i < values.length; i++) {
+      final x = 20 + (i * (size.width - 30) / (values.length - 1));
+      final y = size.height - (values[i] * size.height / 7);
+      points.add(Offset(x, y));
+    }
+    
+    if (points.isEmpty) return path;
+    
+    path.moveTo(points[0].dx, points[0].dy);
+    
+    for (int i = 0; i < points.length - 1; i++) {
+      final current = points[i];
+      final next = points[i + 1];
+      
+      // Calculate control points for smooth curve
+      final controlPoint1 = Offset(
+        current.dx + (next.dx - current.dx) * 0.3,
+        current.dy,
+      );
+      final controlPoint2 = Offset(
+        next.dx - (next.dx - current.dx) * 0.3,
+        next.dy,
+      );
+      
+      path.cubicTo(
+        controlPoint1.dx, controlPoint1.dy,
+        controlPoint2.dx, controlPoint2.dy,
+        next.dx, next.dy,
+      );
+    }
+    
+    return path;
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
