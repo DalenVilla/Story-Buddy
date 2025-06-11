@@ -295,266 +295,719 @@ class TeacherDashboardScreen extends StatelessWidget {
   }
 
   void _showCreateClassDialog(BuildContext context) {
-    final formKey = GlobalKey<FormState>();
-    final classNameController = TextEditingController();
-    String selectedGrade = 'Kindergarten';
-    String selectedSubject = 'English';
-    final List<String> grades = [
-      'Kindergarten',
-      '1st Grade',
-      '2nd Grade',
-      '3rd Grade',
-      '4th Grade',
-      '5th Grade',
-      '6th Grade'
-    ];
-    final List<String> subjects = [
-      'English',
-      'Math',
-      'Science',
-      'Social Studies',
-      'Art',
-      'Music',
-      'Physical Education',
-      'Other'
-    ];
-
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
+        return const CreateClassWizard();
+      },
+    );
+  }
+}
+
+class CreateClassWizard extends StatefulWidget {
+  const CreateClassWizard({super.key});
+
+  @override
+  State<CreateClassWizard> createState() => _CreateClassWizardState();
+}
+
+class _CreateClassWizardState extends State<CreateClassWizard> {
+  final PageController _pageController = PageController();
+  int _currentStep = 0;
+  
+  // Step 1 - Basic Info
+  final _formKey = GlobalKey<FormState>();
+  final _classNameController = TextEditingController();
+  String _selectedGrade = 'Kindergarten';
+  String _selectedSubject = 'English';
+  
+  // Step 2 - Emotions
+  List<String> _selectedEmotions = [];
+  
+  // Step 3 - Class Code (generated)
+  String _generatedClassCode = '';
+
+  final List<String> _grades = [
+    'Kindergarten',
+    '1st Grade',
+    '2nd Grade',
+    '3rd Grade',
+    '4th Grade',
+    '5th Grade',
+    '6th Grade'
+  ];
+
+  final List<String> _subjects = [
+    'English',
+    'Math',
+    'Science',
+    'Social Studies',
+    'Art',
+    'Music',
+    'Physical Education',
+    'Other'
+  ];
+
+  final List<Map<String, dynamic>> _allEmotions = [
+    {'name': 'Empathy', 'icon': Icons.favorite, 'color': Colors.pink},
+    {'name': 'Resilience', 'icon': Icons.shield, 'color': Colors.blue},
+    {'name': 'Kindness', 'icon': Icons.star, 'color': Colors.amber},
+    {'name': 'Confidence', 'icon': Icons.psychology, 'color': Colors.purple},
+    {'name': 'Friendship', 'icon': Icons.people, 'color': Colors.green},
+    {'name': 'Courage', 'icon': Icons.bolt, 'color': Colors.red},
+    {'name': 'Patience', 'icon': Icons.schedule, 'color': Colors.teal},
+    {'name': 'Gratitude', 'icon': Icons.celebration, 'color': Colors.orange},
+    {'name': 'Curiosity', 'icon': Icons.search, 'color': Colors.indigo},
+  ];
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _classNameController.dispose();
+    super.dispose();
+  }
+
+  void _nextStep() {
+    if (_currentStep == 0) {
+      // Validate basic info form
+      if (_formKey.currentState!.validate()) {
+        setState(() {
+          _currentStep++;
+        });
+        _pageController.nextPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    } else if (_currentStep == 1) {
+      // Validate emotions selection
+      if (_selectedEmotions.isNotEmpty) {
+        // Generate class code
+        _generatedClassCode = _generateClassCode();
+        setState(() {
+          _currentStep++;
+        });
+        _pageController.nextPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    }
+  }
+
+  void _previousStep() {
+    if (_currentStep > 0) {
+      setState(() {
+        _currentStep--;
+      });
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  String _generateClassCode() {
+    // Generate a simple 6-character class code
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    return String.fromCharCodes(
+      Iterable.generate(6, (index) => chars.codeUnitAt(
+        (DateTime.now().millisecondsSinceEpoch + index) % chars.length
+      ))
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: MediaQuery.of(context).size.height * 0.7,
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Column(
+          children: [
+            // Header with progress indicators
+            _buildHeader(),
+            const SizedBox(height: 24),
+            
+            // Page content
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  _buildBasicInfoStep(),
+                  _buildEmotionsStep(),
+                  _buildClassCodeStep(),
+                ],
               ),
-              child: Container(
-                padding: const EdgeInsets.all(32),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Navigation buttons
+            _buildNavigationButtons(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF6B73FF).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.class_outlined,
+                color: Color(0xFF6B73FF),
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            const Expanded(
+              child: Text(
+                'Create New Class',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2D3436),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF6B73FF).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.class_outlined,
-                            color: Color(0xFF6B73FF),
-                            size: 24,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        const Expanded(
-                          child: Text(
-                            'Create New Class',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF2D3436),
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          icon: const Icon(Icons.close),
-                          color: Colors.grey[400],
-                        ),
-                      ],
+              ),
+            ),
+            if (_currentStep < 2)
+              IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.close),
+                color: Colors.grey[400],
+              ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        
+        // Progress indicators
+        Row(
+          children: [
+            _buildProgressIndicator(0, 'Basic Info'),
+            Expanded(child: Container(height: 2, color: Colors.grey[300])),
+            _buildProgressIndicator(1, 'Emotions'),
+            Expanded(child: Container(height: 2, color: Colors.grey[300])),
+            _buildProgressIndicator(2, 'Complete'),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProgressIndicator(int step, String label) {
+    final isActive = _currentStep >= step;
+    return Column(
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isActive ? const Color(0xFF6B73FF) : Colors.grey[300],
+          ),
+          child: Center(
+            child: isActive
+                ? const Icon(Icons.check, color: Colors.white, size: 16)
+                : Text(
+                    '${step + 1}',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(height: 24),
-                    Form(
-                      key: formKey,
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            controller: classNameController,
-                            decoration: InputDecoration(
-                              labelText: 'Class Name',
-                              hintText: 'e.g., Morning Reading',
-                              labelStyle: TextStyle(
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.w500,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.grey[300]!),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFF6B73FF),
-                                  width: 2,
-                                ),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 16,
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Please enter a class name';
-                              }
-                              return null;
-                            },
+                  ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: isActive ? const Color(0xFF6B73FF) : Colors.grey[600],
+            fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBasicInfoStep() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Class Information',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2D3436),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Enter the basic details for your new class',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 32),
+          
+          TextFormField(
+            controller: _classNameController,
+            decoration: InputDecoration(
+              labelText: 'Class Name',
+              hintText: 'e.g., Morning Reading',
+              labelStyle: TextStyle(
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(
+                  color: Color(0xFF6B73FF),
+                  width: 2,
+                ),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 16,
+              ),
+            ),
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Please enter a class name';
+              }
+              return null;
+            },
+          ),
+          
+          const SizedBox(height: 20),
+          
+          DropdownButtonFormField<String>(
+            value: _selectedGrade,
+            decoration: InputDecoration(
+              labelText: 'Grade Level',
+              labelStyle: TextStyle(
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(
+                  color: Color(0xFF6B73FF),
+                  width: 2,
+                ),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 16,
+              ),
+            ),
+            items: _grades.map((String grade) {
+              return DropdownMenuItem<String>(
+                value: grade,
+                child: Text(grade),
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              setState(() {
+                _selectedGrade = newValue!;
+              });
+            },
+          ),
+          
+          const SizedBox(height: 20),
+          
+          DropdownButtonFormField<String>(
+            value: _selectedSubject,
+            decoration: InputDecoration(
+              labelText: 'Subject',
+              labelStyle: TextStyle(
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(
+                  color: Color(0xFF6B73FF),
+                  width: 2,
+                ),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 16,
+              ),
+            ),
+            items: _subjects.map((String subject) {
+              return DropdownMenuItem<String>(
+                value: subject,
+                child: Text(subject),
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              setState(() {
+                _selectedSubject = newValue!;
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmotionsStep() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Emotional Focus',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2D3436),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Select 1-3 emotional themes for your class (${_selectedEmotions.length}/3 selected)',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 32),
+        
+        Expanded(
+          child: SingleChildScrollView(
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: _allEmotions.map((emotion) {
+                final emotionName = emotion['name'] as String;
+                final isSelected = _selectedEmotions.contains(emotionName);
+                final canSelect = _selectedEmotions.length < 3 || isSelected;
+
+                return GestureDetector(
+                  onTap: canSelect ? () {
+                    setState(() {
+                      if (isSelected) {
+                        _selectedEmotions.remove(emotionName);
+                      } else {
+                        if (_selectedEmotions.length < 3) {
+                          _selectedEmotions.add(emotionName);
+                        }
+                      }
+                    });
+                  } : null,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? (emotion['color'] as Color).withOpacity(0.2)
+                          : Colors.grey[50],
+                      border: Border.all(
+                        color: isSelected
+                            ? emotion['color'] as Color
+                            : canSelect
+                                ? Colors.grey[300]!
+                                : Colors.grey[200]!,
+                        width: isSelected ? 2 : 1,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          emotion['icon'] as IconData,
+                          color: isSelected || canSelect
+                              ? emotion['color'] as Color
+                              : Colors.grey[400],
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          emotionName,
+                          style: TextStyle(
+                            color: isSelected
+                                ? emotion['color'] as Color
+                                : canSelect
+                                    ? const Color(0xFF2D3436)
+                                    : Colors.grey[400],
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                           ),
-                          const SizedBox(height: 20),
-                          DropdownButtonFormField<String>(
-                            value: selectedGrade,
-                            decoration: InputDecoration(
-                              labelText: 'Grade Level',
-                              labelStyle: TextStyle(
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.w500,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.grey[300]!),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFF6B73FF),
-                                  width: 2,
-                                ),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 16,
-                              ),
-                            ),
-                            items: grades.map((String grade) {
-                              return DropdownMenuItem<String>(
-                                value: grade,
-                                child: Text(grade),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedGrade = newValue!;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 20),
-                          DropdownButtonFormField<String>(
-                            value: selectedSubject,
-                            decoration: InputDecoration(
-                              labelText: 'Subject',
-                              labelStyle: TextStyle(
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.w500,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.grey[300]!),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFF6B73FF),
-                                  width: 2,
-                                ),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 16,
-                              ),
-                            ),
-                            items: subjects.map((String subject) {
-                              return DropdownMenuItem<String>(
-                                value: subject,
-                                child: Text(subject),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedSubject = newValue!;
-                              });
-                            },
+                        ),
+                        if (isSelected) ...[
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.check_circle,
+                            color: emotion['color'] as Color,
+                            size: 18,
                           ),
                         ],
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              side: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            child: Text(
-                              'Cancel',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              if (formKey.currentState!.validate()) {
-                                // Handle class creation logic here
-                                Navigator.of(context).pop();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Class "${classNameController.text}" created successfully!',
-                                    ),
-                                    backgroundColor: const Color(0xFF6B73FF),
-                                    behavior: SnackBarBehavior.floating,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6B73FF),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 0,
-                            ),
-                            child: const Text(
-                              'Create Class',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
-                  ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+        
+        if (_selectedEmotions.isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: Text(
+              'Please select at least one emotional theme',
+              style: TextStyle(
+                color: Colors.red[600],
+                fontSize: 14,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildClassCodeStep() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          const SizedBox(height: 40),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF6B73FF).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.check_circle,
+              color: Color(0xFF6B73FF),
+              size: 48,
+            ),
+          ),
+          
+          const SizedBox(height: 24),
+          
+          const Text(
+            'Class Created Successfully!',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2D3436),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          
+          const SizedBox(height: 12),
+          
+          Text(
+            'Your class "${_classNameController.text}" has been created.',
+            style: TextStyle(
+              fontSize: 15,
+              color: Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          
+          const SizedBox(height: 24),
+          
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: Column(
+              children: [
+                const Text(
+                  'Class Code',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF2D3436),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _generatedClassCode,
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF6B73FF),
+                    letterSpacing: 3,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Share this code with your students so they can join your class',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 40),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavigationButtons() {
+    if (_currentStep == 2) {
+      // Final step - only Close button
+      return SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Class "${_classNameController.text}" created! Code: $_generatedClassCode',
+                ),
+                backgroundColor: const Color(0xFF6B73FF),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
             );
           },
-        );
-      },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF6B73FF),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            elevation: 0,
+          ),
+          child: const Text(
+            'Close',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      children: [
+        if (_currentStep > 0)
+          Expanded(
+            child: OutlinedButton(
+              onPressed: _previousStep,
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                side: BorderSide(color: Colors.grey[300]!),
+              ),
+              child: Text(
+                'Previous',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ),
+          ),
+        
+        if (_currentStep > 0) const SizedBox(width: 16),
+        
+        Expanded(
+          child: ElevatedButton(
+            onPressed: _currentStep == 0 
+                ? _nextStep
+                : _selectedEmotions.isNotEmpty 
+                    ? _nextStep
+                    : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF6B73FF),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 0,
+            ),
+            child: Text(
+              _currentStep == 0 ? 'Next' : 'Finish',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+        
+        if (_currentStep == 0)
+          const SizedBox(width: 16),
+        
+        if (_currentStep == 0)
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                side: BorderSide(color: Colors.grey[300]!),
+              ),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
