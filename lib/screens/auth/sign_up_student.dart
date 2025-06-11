@@ -422,8 +422,7 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
                   ],
                 ),
               ),
-            ),
-          ],
+          ]),
         ),
       ),
     );

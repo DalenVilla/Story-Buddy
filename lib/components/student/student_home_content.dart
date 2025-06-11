@@ -19,187 +19,261 @@ class StorytimeHomeContent extends StatelessWidget {
       {
         'title': 'The Brave Little Mouse',
         'emotion': 'Bravery',
-        'emoji': '💪',
+        'emoji': '🐭',
+        'bigEmoji': '💪',
         'color': Colors.red,
-        'description': 'Follow a tiny mouse as they overcome their biggest fears!',
+        'description': 'A tiny mouse becomes super brave!',
+        'image': '🏰', // Castle placeholder
       },
       {
         'title': 'Lily\'s First Day Adventure',
         'emotion': 'Trying New Things',
-        'emoji': '🧠',
+        'emoji': '👧',
+        'bigEmoji': '🧠',
         'color': Colors.blue,
-        'description': 'Join Lily as she tries something completely new and exciting!',
+        'description': 'Join Lily\'s exciting new adventure!',
+        'image': '🌈', // Rainbow placeholder
       },
       {
         'title': 'The Kindness Tree',
         'emotion': 'Kindness',
-        'emoji': '💖',
+        'emoji': '🌳',
+        'bigEmoji': '💖',
         'color': Colors.pink,
-        'description': 'Discover how small acts of kindness can grow into something magical!',
+        'description': 'Watch kindness grow like magic!',
+        'image': '🌸', // Flower placeholder
+      },
+      {
+        'title': 'Max and the Friendship Club',
+        'emotion': 'Friendship',
+        'emoji': '🐶',
+        'bigEmoji': '🤝',
+        'color': Colors.orange,
+        'description': 'Making friends is awesome!',
+        'image': '🎈', // Balloon placeholder
+      },
+      {
+        'title': 'The Curious Cat\'s Quest',
+        'emotion': 'Curiosity',
+        'emoji': '🐱',
+        'bigEmoji': '🔍',
+        'color': Colors.purple,
+        'description': 'Explore with the curious cat!',
+        'image': '🚀', // Rocket placeholder
       },
     ];
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Current class emotions section
-          _buildClassEmotionsSection(),
+          // Welcome message with big friendly text
+          Center(
+            child: Column(
+              children: [
+                const Text(
+                  '📚✨',
+                  style: TextStyle(fontSize: 40),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Story Time!',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF6B73FF),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Stories specially picked for your class!',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
           
           const SizedBox(height: 32),
           
-          // What do you want to do today?
-          const Text(
-            '👇 What do you want to do today?',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2D3436),
+          // Quick action button - Write Story
+          Center(
+            child: Container(
+              width: double.infinity,
+              constraints: const BoxConstraints(maxWidth: 300),
+              child: _buildBigActionButton(
+                emoji: '✏️',
+                title: 'Write Story',
+                color: const Color(0xFF6B73FF),
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Story writing coming soon! 📝'),
+                      backgroundColor: Color(0xFF6B73FF),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          
+          const SizedBox(height: 40),
+          
+          // Fun divider
+          Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  height: 3,
+                  width: 60,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF6B73FF), Color(0xFF9B59B6)],
+                    ),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Text('🌟', style: TextStyle(fontSize: 24)),
+                ),
+                Container(
+                  height: 3,
+                  width: 60,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF9B59B6), Color(0xFF6B73FF)],
+                    ),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 40),
+          
+          // Stories section title
+          const Center(
+            child: Text(
+              '🎭 Amazing Stories for You!',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2D3436),
+              ),
             ),
           ),
           
           const SizedBox(height: 24),
           
-          // Main action buttons
-          Row(
-            children: [
-              // Start a New Story button
-              Expanded(
-                child: _buildActionButton(
-                  icon: '📝',
-                  title: 'Start a New Story',
-                  subtitle: 'Create your own adventure',
-                  color: const Color(0xFF6B73FF),
-                  onTap: () {
-                    // Navigate to story creation
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Story creation coming soon!'),
-                        backgroundColor: Color(0xFF6B73FF),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              
-              const SizedBox(width: 16),
-              
-              // See My Stories button
-              Expanded(
-                child: _buildActionButton(
-                  icon: '📚',
-                  title: 'See My Stories',
-                  subtitle: 'View your collection',
-                  color: const Color(0xFF9B59B6),
-                  onTap: () {
-                    // Navigate to story library
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Story library coming soon!'),
-                        backgroundColor: Color(0xFF9B59B6),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
+          // Teacher stories - big kid-friendly cards
+          ...emotionBasedStories.map((story) {
+            return Container(
+              margin: const EdgeInsets.only(bottom: 20),
+              child: _buildKidFriendlyStoryCard(story),
+            );
+          }).toList(),
           
           const SizedBox(height: 32),
           
-          // Stories from teacher section
-          Row(
-            children: [
-              const Text(
-                '👨‍🏫 Stories from Ms. Johnson',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2D3436),
+          // Bottom encouragement message
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF6B73FF), Color(0xFF9B59B6)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-              ),
-              const Spacer(),
-              TextButton(
-                onPressed: () {
-                  // View all teacher stories
-                },
-                child: Text(
-                  'See All',
-                  style: TextStyle(
-                    color: const Color(0xFF6B73FF),
-                    fontWeight: FontWeight.w600,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF6B73FF).withOpacity(0.3),
+                    blurRadius: 15,
+                    offset: const Offset(0, 6),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
-          
-          const SizedBox(height: 4),
-          
-          Text(
-            'Stories specially picked for your class emotions:',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
+              child: Column(
+                children: [
+                  const Text(
+                    '🌟',
+                    style: TextStyle(fontSize: 32),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Keep Reading!',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'You\'re doing amazing! 🎉',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white.withOpacity(0.9),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          
-          const SizedBox(height: 16),
-          
-          // Teacher stories based on emotions
-          ...emotionBasedStories.map((story) {
-            return Container(
-              margin: const EdgeInsets.only(bottom: 16),
-              child: _buildStoryCard(story),
-            );
-          }).toList(),
         ],
       ),
     );
   }
 
-  Widget _buildActionButton({
-    required String icon,
+  Widget _buildBigActionButton({
+    required String emoji,
     required String title,
-    required String subtitle,
     required Color color,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        height: 120,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: color.withOpacity(0.3),
-            width: 2,
+            color: color.withOpacity(0.4),
+            width: 3,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.2),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              icon,
-              style: const TextStyle(fontSize: 32),
+              emoji,
+              style: const TextStyle(fontSize: 40),
             ),
             const SizedBox(height: 12),
             Text(
               title,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: color,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
               ),
               textAlign: TextAlign.center,
             ),
@@ -209,168 +283,131 @@ class StorytimeHomeContent extends StatelessWidget {
     );
   }
 
-  Widget _buildStoryCard(Map<String, dynamic> story) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+  Widget _buildKidFriendlyStoryCard(Map<String, dynamic> story) {
+    return GestureDetector(
+      onTap: () {
+        // Handle story tap
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: (story['color'] as Color).withOpacity(0.3),
+            width: 2,
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Story emotion chip
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: (story['color'] as Color).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: (story['color'] as Color).withOpacity(0.3),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.15),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Big emoji image placeholder
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: (story['color'] as Color).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: (story['color'] as Color).withOpacity(0.3),
+                  width: 2,
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  story['image'] as String,
+                  style: const TextStyle(fontSize: 32),
+                ),
               ),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  story['emoji'] as String,
-                  style: const TextStyle(fontSize: 16),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  story['emotion'] as String,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: story['color'] as Color,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(width: 16),
-          
-          // Story details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  story['title'] as String,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D3436),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  story['description'] as String,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          // Play button
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF6B73FF).withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.play_arrow,
-              color: Color(0xFF6B73FF),
-              size: 24,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildClassEmotionsSection() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Section title
-          Text(
-            '🎯 This current class emotions:',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF2D3436),
-            ),
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Emotion chips
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: classEmotions.map((emotion) {
-                return Container(
-                  margin: const EdgeInsets.only(right: 12),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: (emotion['color'] as Color).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: (emotion['color'] as Color).withOpacity(0.3),
-                      width: 2,
+            
+            const SizedBox(width: 20),
+            
+            // Story details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Emotion chip
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: (story['color'] as Color).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          story['bigEmoji'] as String,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          story['emotion'] as String,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: story['color'] as Color,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        emotion['emoji'] as String,
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        emotion['name'] as String,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: emotion['color'] as Color,
-                        ),
-                      ),
-                    ],
+                  
+                  const SizedBox(height: 12),
+                  
+                  Text(
+                    story['title'] as String,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2D3436),
+                    ),
                   ),
-                );
-              }).toList(),
+                  
+                  const SizedBox(height: 6),
+                  
+                  Text(
+                    story['description'] as String,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            
+            // Big play button
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: story['color'] as Color,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: (story['color'] as Color).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.play_arrow,
+                color: Colors.white,
+                size: 32,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

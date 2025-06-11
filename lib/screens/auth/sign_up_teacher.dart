@@ -664,8 +664,7 @@ class _SignUpTeacherScreenState extends State<SignUpTeacherScreen> {
                   ],
                 ),
               ),
-            ),
-          ],
+          ]),
         ),
       ),
     );
