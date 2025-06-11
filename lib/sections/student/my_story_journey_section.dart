@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../widgets/story_card.dart';
-import '../widgets/illustrations/treehouse_illustration.dart';
-import '../widgets/illustrations/buddy_illustration.dart';
-import '../widgets/illustrations/woods_illustration.dart';
+import '../../widgets/story_card.dart';
+import '../../widgets/illustrations/treehouse_illustration.dart';
+import '../../widgets/illustrations/buddy_illustration.dart';
+import '../../widgets/illustrations/woods_illustration.dart';
 
 class MyStoryJourneySection extends StatelessWidget {
   const MyStoryJourneySection({super.key});

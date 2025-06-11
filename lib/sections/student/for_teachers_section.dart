@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../widgets/story_card.dart';
-import '../widgets/illustrations/classroom_illustration.dart';
-import '../widgets/illustrations/field_trip_illustration.dart';
-import '../widgets/illustrations/school_illustration.dart';
+import '../../widgets/story_card.dart';
+import '../../widgets/illustrations/classroom_illustration.dart';
+import '../../widgets/illustrations/field_trip_illustration.dart';
+import '../../widgets/illustrations/school_illustration.dart';
 
 class ForTeachersSection extends StatelessWidget {
   const ForTeachersSection({super.key});

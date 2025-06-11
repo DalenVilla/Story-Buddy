@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../components/storytime_app_bar.dart';
-import '../../components/storytime_home_content.dart';
-import '../../components/storytime_bottom_nav_bar.dart';
+import '../../components/student/student_app_bar.dart';
+import '../../components/student/student_home_content.dart';
+import '../../components/student/student_bottom_nav_bar.dart';
 
 class StorytimeHomeScreen extends StatefulWidget {
   const StorytimeHomeScreen({super.key});

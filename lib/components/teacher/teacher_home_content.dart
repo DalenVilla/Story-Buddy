@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../sections/welcome_section.dart';
-import '../sections/discover_button_section.dart';
-import '../sections/my_story_journey_section.dart';
-import '../sections/for_teachers_section.dart';
+import '../../sections/student/welcome_section.dart'; // TODO: CHANGE THIS TO TEACHERS
+import '../../sections/student/discover_button_section.dart';
+import '../../sections/student/my_story_journey_section.dart';
+import '../../sections/student/for_teachers_section.dart';
 
 class StorytimeHomeContent extends StatelessWidget {
   const StorytimeHomeContent({super.key});
