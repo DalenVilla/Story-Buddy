@@ -44,7 +44,7 @@ class _SignUpTeacherScreenState extends State<SignUpTeacherScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const StorytimeHomeScreen(),
+          builder: (context) => const TeacherHomeScreen(),
         ),
       );
     }
@@ -67,7 +67,7 @@ class _SignUpTeacherScreenState extends State<SignUpTeacherScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => const StorytimeHomeScreen(),
+        builder: (context) => const TeacherHomeScreen(),
       ),
     );
   }
