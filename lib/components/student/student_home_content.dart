@@ -105,7 +105,7 @@ class StorytimeHomeContent extends StatelessWidget {
           Center(
             child: Container(
               width: double.infinity,
-              constraints: const BoxConstraints(maxWidth: 300),
+              constraints: const BoxConstraints(maxWidth: 400),
               child: _buildBigActionButton(
                 emoji: '✏️',
                 title: 'Write Story',
