@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../screens/student/story_onboarding_screen.dart';
 
 class StorytimeHomeContent extends StatelessWidget {
   final List<Map<String, dynamic>> classEmotions;
@@ -110,14 +111,14 @@ class StorytimeHomeContent extends StatelessWidget {
                 emoji: '✏️',
                 title: 'Write Story',
                 color: const Color(0xFF6B73FF),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Story writing coming soon! 📝'),
-                      backgroundColor: Color(0xFF6B73FF),
-                    ),
-                  );
-                },
+                                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const StoryOnboardingScreen(),
+                      ),
+                    );
+                  },
               ),
             ),
           ),
