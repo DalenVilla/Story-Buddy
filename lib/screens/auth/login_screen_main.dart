@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../storytime_home_screen.dart';
+import '../student/student_home_screen.dart'; // TODO: CHANGE THIS
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

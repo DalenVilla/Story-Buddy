@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../storytime_home_screen.dart';
+import '../teacher/teacher_home_screen.dart';
 
 class SignUpTeacherScreen extends StatefulWidget {
   const SignUpTeacherScreen({super.key});

@@ -46,7 +46,7 @@ class StorytimeBottomNavBar extends StatelessWidget {
           BottomNavigationBarItem(
             icon: Icon(Icons.book_outlined),
             activeIcon: Icon(Icons.book),
-            label: 'Stories',
+            label: 'Stories test',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.explore_outlined),
