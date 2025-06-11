@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class TeacherClassDetailScreen extends StatelessWidget {
+class TeacherClassDetailScreen extends StatefulWidget {
   final String className;
   final String grade;
   final String subject;
@@ -16,12 +16,33 @@ class TeacherClassDetailScreen extends StatelessWidget {
   });
 
   @override
+  State<TeacherClassDetailScreen> createState() => _TeacherClassDetailScreenState();
+}
+
+class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
+  // Current selected emotions (up to 3)
+  List<String> selectedEmotions = ['Empathy', 'Resilience', 'Kindness'];
+
+  // All available emotions (9 total)
+  final List<Map<String, dynamic>> allEmotions = [
+    {'name': 'Empathy', 'icon': Icons.favorite, 'color': Colors.pink},
+    {'name': 'Resilience', 'icon': Icons.shield, 'color': Colors.blue},
+    {'name': 'Kindness', 'icon': Icons.star, 'color': Colors.amber},
+    {'name': 'Confidence', 'icon': Icons.psychology, 'color': Colors.purple},
+    {'name': 'Friendship', 'icon': Icons.people, 'color': Colors.green},
+    {'name': 'Courage', 'icon': Icons.bolt, 'color': Colors.red},
+    {'name': 'Patience', 'icon': Icons.schedule, 'color': Colors.teal},
+    {'name': 'Gratitude', 'icon': Icons.celebration, 'color': Colors.orange},
+    {'name': 'Curiosity', 'icon': Icons.search, 'color': Colors.indigo},
+  ];
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: Text(
-          className,
+          widget.className,
           style: const TextStyle(
             fontWeight: FontWeight.w600,
             color: Colors.white,
@@ -87,7 +108,7 @@ class TeacherClassDetailScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Ms. Johnson's $grade",
+                      "Ms. Johnson's ${widget.grade}",
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -96,7 +117,7 @@ class TeacherClassDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '$grade • $students students • $subject',
+                      '${widget.grade} • ${widget.students} students • ${widget.subject}',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.grey[600],
@@ -165,33 +186,42 @@ class TeacherClassDetailScreen extends StatelessWidget {
   }
 
   Widget _buildEmotionalFocusAreas() {
-    final emotions = [
-      {'name': 'Empathy', 'icon': Icons.favorite, 'color': Colors.pink},
-      {'name': 'Resilience', 'icon': Icons.shield, 'color': Colors.blue},
-      {'name': 'Kindness', 'icon': Icons.star, 'color': Colors.amber},
-      {'name': 'Confidence', 'icon': Icons.psychology, 'color': Colors.purple},
-      {'name': 'Friendship', 'icon': Icons.people, 'color': Colors.green},
-    ];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Emotional Focus Areas',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF2D3436),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Current Emotional Focus',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2D3436),
+              ),
+            ),
+            TextButton.icon(
+              onPressed: () => _showEmotionSelectionDialog(),
+              icon: const Icon(Icons.edit, size: 16),
+              label: const Text('Edit'),
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF6B73FF),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
         SizedBox(
           height: 50,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: emotions.length,
+            itemCount: selectedEmotions.length,
             itemBuilder: (context, index) {
-              final emotion = emotions[index];
+              final emotionName = selectedEmotions[index];
+              final emotion = allEmotions.firstWhere(
+                (e) => e['name'] == emotionName,
+              );
               return Container(
                 margin: const EdgeInsets.only(right: 12),
                 child: Chip(
@@ -548,5 +578,214 @@ class TeacherClassDetailScreen extends StatelessWidget {
       default:
         return Colors.grey;
     }
+  }
+
+  void _showEmotionSelectionDialog() {
+    List<String> tempSelectedEmotions = List.from(selectedEmotions);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(32),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF6B73FF).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.psychology_outlined,
+                            color: Color(0xFF6B73FF),
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        const Expanded(
+                          child: Text(
+                            'Select Emotional Focus',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF2D3436),
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(Icons.close),
+                          color: Colors.grey[400],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Choose up to 3 emotional themes for your class (${tempSelectedEmotions.length}/3 selected)',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: allEmotions.map((emotion) {
+                        final emotionName = emotion['name'] as String;
+                        final isSelected = tempSelectedEmotions.contains(emotionName);
+                        final canSelect = tempSelectedEmotions.length < 3 || isSelected;
+
+                        return GestureDetector(
+                          onTap: canSelect ? () {
+                            setState(() {
+                              if (isSelected) {
+                                tempSelectedEmotions.remove(emotionName);
+                              } else {
+                                if (tempSelectedEmotions.length < 3) {
+                                  tempSelectedEmotions.add(emotionName);
+                                }
+                              }
+                            });
+                          } : null,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? (emotion['color'] as Color).withOpacity(0.2)
+                                  : Colors.grey[50],
+                              border: Border.all(
+                                color: isSelected
+                                    ? emotion['color'] as Color
+                                    : canSelect
+                                        ? Colors.grey[300]!
+                                        : Colors.grey[200]!,
+                                width: isSelected ? 2 : 1,
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  emotion['icon'] as IconData,
+                                  color: isSelected || canSelect
+                                      ? emotion['color'] as Color
+                                      : Colors.grey[400],
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  emotionName,
+                                  style: TextStyle(
+                                    color: isSelected
+                                        ? emotion['color'] as Color
+                                        : canSelect
+                                            ? const Color(0xFF2D3436)
+                                            : Colors.grey[400],
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                  ),
+                                ),
+                                if (isSelected) ...[
+                                  const SizedBox(width: 8),
+                                  Icon(
+                                    Icons.check_circle,
+                                    color: emotion['color'] as Color,
+                                    size: 18,
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 32),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              side: BorderSide(color: Colors.grey[300]!),
+                            ),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: tempSelectedEmotions.isNotEmpty ? () {
+                              this.setState(() {
+                                selectedEmotions = List.from(tempSelectedEmotions);
+                              });
+                              Navigator.of(context).pop();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Emotional focus updated! Now focusing on: ${tempSelectedEmotions.join(", ")}',
+                                  ),
+                                  backgroundColor: const Color(0xFF6B73FF),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              );
+                            } : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF6B73FF),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: const Text(
+                              'Save Changes',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 } 
