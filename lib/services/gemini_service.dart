@@ -135,6 +135,7 @@ Avoid moralizing or lecturing. Instead, reflect their emotional journey in a met
 Write at a reading level for a 6-year-old:
 - Use simple, age-appropriate words
 - Use short sentences (10 words or fewer)
+- 6 Paragraphs
 - Use gentle and clear ideas they can easily understand
 - No complex metaphors or long dialogue
 - No introduction or explanation — **just return the story only**
