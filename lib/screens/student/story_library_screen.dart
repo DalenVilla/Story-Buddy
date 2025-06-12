@@ -5,6 +5,7 @@ import '../../services/story_storage_service.dart';
 import '../../services/story_event_service.dart';
 import 'story_onboarding_screen.dart';
 import 'story_result_screen.dart';
+import '../../services/teacher_story_service.dart';
 
 class StoryLibraryScreen extends StatefulWidget {
   const StoryLibraryScreen({super.key});
@@ -18,10 +19,14 @@ class _StoryLibraryScreenState extends State<StoryLibraryScreen> {
   bool _isLoading = true;
   StreamSubscription<void>? _storyUpdateSubscription;
 
+  List<TeacherStory> _teacherStories = [];
+  bool _isLoadingTeacher = true;
+
   @override
   void initState() {
     super.initState();
     _loadUserStories();
+    _loadTeacherStories();
     
     // Listen for story updates
     _storyUpdateSubscription = StoryEventService.onStoryUpdated.listen((_) {
@@ -56,6 +61,25 @@ class _StoryLibraryScreenState extends State<StoryLibraryScreen> {
       if (mounted) {
         setState(() {
           _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadTeacherStories() async {
+    try {
+      final stories = await TeacherStoryService.fetchTeacherStories();
+      if (mounted) {
+        setState(() {
+          _teacherStories = stories;
+          _isLoadingTeacher = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading teacher stories: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingTeacher = false;
         });
       }
     }
@@ -154,7 +178,7 @@ class _StoryLibraryScreenState extends State<StoryLibraryScreen> {
                         // Fun welcome message
 
             
-            // My Teacher Stories
+            // Teacher Stories section
             const Text(
               'Teacher Stories',
               style: TextStyle(
@@ -164,56 +188,7 @@ class _StoryLibraryScreenState extends State<StoryLibraryScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            
-            SizedBox(
-              height: 240,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  _buildStoryCard(
-                    'The Magical Treehouse',
-                    _buildTreehouseIllustration(),
-                    const LinearGradient(
-                      colors: [Color(0xFFFFB347), Color(0xFFFF8C42)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  _buildStoryCard(
-                    'Adventures with Buddy',
-                    _buildBuddyIllustration(),
-                    const LinearGradient(
-                      colors: [Color(0xFF98FB98), Color(0xFF90EE90)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  _buildStoryCard(
-                    'The Wonder Garden',
-                    _buildGardenIllustration(),
-                    const LinearGradient(
-                      colors: [Color(0xFFFFB6C1), Color(0xFFFF69B4)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  _buildStoryCard(
-                    'Space Explorer',
-                    _buildSpaceIllustration(),
-                    const LinearGradient(
-                      colors: [Color(0xFF87CEEB), Color(0xFF4169E1)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            const SizedBox(height: 40),
+            _buildTeacherStoriesSection(),
             
             // My Stories
             const Text(
@@ -465,60 +440,127 @@ class _StoryLibraryScreenState extends State<StoryLibraryScreen> {
     );
   }
 
-  Widget _buildStoryCard(String title, Widget illustration, LinearGradient gradient) {
-    return Container(
-      width: 160,
-      decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+  Widget _buildTeacherStoriesSection() {
+    if (_isLoadingTeacher) {
+      return const SizedBox(
+        height: 240,
+        child: Center(
+          child: CircularProgressIndicator(
+            color: Color(0xFF9B59B6),
           ),
-          BoxShadow(
-            color: Colors.white.withOpacity(0.8),
-            blurRadius: 8,
-            offset: const Offset(-2, -2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Story illustration
-            Expanded(
-              flex: 4,
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: illustration,
-                ),
-              ),
+        ),
+      );
+    }
+
+    if (_teacherStories.isEmpty) {
+      return SizedBox(
+        height: 120,
+        child: Center(
+          child: Text(
+            'No assigned stories yet!',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
             ),
-            
-            const SizedBox(height: 12),
-            
-            // Title
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2D3436),
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: 240,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: _teacherStories.length,
+        itemBuilder: (context, index) {
+          final ts = _teacherStories[index];
+          return Padding(
+            padding: EdgeInsets.only(right: index < _teacherStories.length - 1 ? 16 : 0),
+            child: _buildTeacherStoryCard(ts),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildTeacherStoryCard(TeacherStory ts) {
+    return GestureDetector(
+      onTap: () {
+        final storyObj = Story(
+          id: ts.id,
+          title: ts.name,
+          content: ts.content,
+          imageUrl: ts.imageUrl,
+          choices: const <int, String>{},
+          createdAt: DateTime.now(),
+        );
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => StoryResultScreen(
+              story: ts.content,
+              choices: const <int, String>{},
+              existingStory: storyObj,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        width: 160,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF9B59B6), Color(0xFF6B73FF)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
             ),
           ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 4,
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: ts.imageUrl.isNotEmpty
+                        ? Image.network(
+                            ts.imageUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (c, e, s) => const Icon(Icons.image_not_supported),
+                          )
+                        : const Center(child: Icon(Icons.image, size: 40, color: Color(0xFF9B59B6))),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                ts.name,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );
