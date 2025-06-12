@@ -99,108 +99,109 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
   Widget _buildSlide1() {
     return Padding(
       padding: const EdgeInsets.all(24),
-      child: Column(
-        children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF6B73FF), Color(0xFF9B59B6)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF6B73FF).withOpacity(0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: const Column(
-              children: [
-                Text('🎡', style: TextStyle(fontSize: 48)),
-                SizedBox(height: 16),
-                Text(
-                  'How are you feeling right now?',
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 32),
-          
-          // Voice button
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SpeechRecordingScreen(),
-                ),
-              );
-            },
-            child: Container(
-              width: double.infinity,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Header
+            Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFFFF6B6B).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFFFF6B6B), width: 2),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF6B73FF), Color(0xFF9B59B6)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFFF6B6B).withOpacity(0.2),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
+                    color: const Color(0xFF6B73FF).withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
                   ),
                 ],
               ),
-              child: Column(
+              child: const Column(
                 children: [
-                  const Text('🎤', style: TextStyle(fontSize: 32)),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Talk instead?',
+                  Text('🎡', style: TextStyle(fontSize: 48)),
+                  SizedBox(height: 16),
+                  Text(
+                    'How are you feeling right now?',
                     style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2D3436),
+                      fontSize: 34,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ],
               ),
             ),
-          ),
-          
-          const SizedBox(height: 24),
-          
-          Text(
-            '— Or choose below —',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
+            
+            const SizedBox(height: 32),
+            
+            // Voice button
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SpeechRecordingScreen(),
+                  ),
+                );
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF6B6B).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFFFF6B6B), width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFF6B6B).withOpacity(0.2),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    const Text('🎤', style: TextStyle(fontSize: 32)),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Talk instead?',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2D3436),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Options grid
-          Expanded(
-            child: GridView.count(
+            
+            const SizedBox(height: 24),
+            
+            Text(
+              '— Or choose below —',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Options grid
+            GridView.count(
               crossAxisCount: 2,
               childAspectRatio: 1.2,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
+              shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
                              children: [
                  _buildChoiceCard('😊', 'Happy', 0, 0),
@@ -209,8 +210,8 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
                  _buildChoiceCard('😕', 'Okay', 0, 3),
                ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -218,51 +219,52 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
   Widget _buildSlide2() {
     return Padding(
       padding: const EdgeInsets.all(24),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF6B73FF), Color(0xFF9B59B6)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF6B73FF).withOpacity(0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF6B73FF), Color(0xFF9B59B6)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-              ],
-            ),
-            child: Column(
-              children: [
-                const Text('🌤️', style: TextStyle(fontSize: 48)),
-                const SizedBox(height: 16),
-                const Text(
-                  'What kind of weather are you?',
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF6B73FF).withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                
-              ],
+                ],
+              ),
+              child: Column(
+                children: [
+                  const Text('🌤️', style: TextStyle(fontSize: 48)),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'What kind of weather are you?',
+                    style: TextStyle(
+                      fontSize: 34,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  
+                ],
+              ),
             ),
-          ),
-          
-          const SizedBox(height: 32),
-          
-          Expanded(
-            child: GridView.count(
+            
+            const SizedBox(height: 32),
+            
+            GridView.count(
               crossAxisCount: 2,
               childAspectRatio: 1.2,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
+              shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
                              children: [
                  _buildChoiceCard('🌞', 'Sunny', 1, 0),
@@ -271,8 +273,8 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
                  _buildChoiceCard('🌥️', 'Cloudy', 1, 3),
                ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -280,61 +282,62 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
   Widget _buildSlide3() {
     return Padding(
       padding: const EdgeInsets.all(24),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF6B73FF), Color(0xFF9B59B6)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF6B73FF).withOpacity(0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF6B73FF), Color(0xFF9B59B6)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-              ],
-            ),
-            child: Column(
-              children: [
-                const Text('🧠', style: TextStyle(fontSize: 48)),
-                const SizedBox(height: 16),
-                const Text(
-                  'What happened?',
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF6B73FF).withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                
-              ],
+                ],
+              ),
+              child: Column(
+                children: [
+                  const Text('🧠', style: TextStyle(fontSize: 48)),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'What happened?',
+                    style: TextStyle(
+                      fontSize: 34,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  
+                ],
+              ),
             ),
-          ),
-          
-          const SizedBox(height: 32),
-          
-          Expanded(
-            child: GridView.count(
+            
+            const SizedBox(height: 32),
+            
+            GridView.count(
               crossAxisCount: 2,
               childAspectRatio: 1.2,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
+              shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
                              children: [
-                 _buildChoiceCard('🧸', 'Someone was mean', 2, 0),
-                 _buildChoiceCard('🧪', 'Something broke', 2, 1),
+                 _buildChoiceCard('🙁', 'Someone was mean', 2, 0),
+                 _buildChoiceCard('🧩', 'Something broke', 2, 1),
                  _buildChoiceCard('🎉', 'Something fun', 2, 2),
                  _buildChoiceCard('😶', 'I don\'t know', 2, 3),
                ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -342,51 +345,52 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
   Widget _buildSlide4() {
     return Padding(
       padding: const EdgeInsets.all(24),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF6B73FF), Color(0xFF9B59B6)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF6B73FF).withOpacity(0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF6B73FF), Color(0xFF9B59B6)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-              ],
-            ),
-            child: Column(
-              children: [
-                const Text('💫', style: TextStyle(fontSize: 48)),
-                const SizedBox(height: 16),
-                const Text(
-                  'Make today better?',
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF6B73FF).withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                
-              ],
+                ],
+              ),
+              child: Column(
+                children: [
+                  const Text('💫', style: TextStyle(fontSize: 48)),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Make today better?',
+                    style: TextStyle(
+                      fontSize: 34,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  
+                ],
+              ),
             ),
-          ),
-          
-          const SizedBox(height: 32),
-          
-          Expanded(
-            child: GridView.count(
+            
+            const SizedBox(height: 32),
+            
+            GridView.count(
               crossAxisCount: 2,
               childAspectRatio: 1.2,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
+              shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
                              children: [
                  _buildChoiceCard('⏰', 'Fix something', 3, 0),
@@ -395,76 +399,76 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
                  _buildChoiceCard('🧘', 'Rest quietly', 3, 3),
                ],
             ),
-          ),
-          
-          const SizedBox(height: 24),
-          
-                     // Create Story button (only shows when all answers are selected)
-           if (_selectedAnswers.length == 4 && 
-               _selectedAnswers[0] != null && 
-               _selectedAnswers[1] != null && 
-               _selectedAnswers[2] != null && 
-               _selectedAnswers[3] != null)
-            GestureDetector(
-              onTap: () {
-                if (widget.isAdventure) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AdventureStoryScreen(
-                        choices: Map<int, String>.from(_selectedAnswers),
+            
+            const SizedBox(height: 24),
+            
+                       // Create Story button (only shows when all answers are selected)
+             if (_selectedAnswers.length == 4 && 
+                 _selectedAnswers[0] != null && 
+                 _selectedAnswers[1] != null && 
+                 _selectedAnswers[2] != null && 
+                 _selectedAnswers[3] != null)
+              GestureDetector(
+                onTap: () {
+                  if (widget.isAdventure) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AdventureStoryScreen(
+                          choices: Map<int, String>.from(_selectedAnswers),
+                        ),
                       ),
-                    ),
-                  );
-                } else {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => StoryGeneratingScreen(
-                        choices: Map<int, String>.from(_selectedAnswers),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => StoryGeneratingScreen(
+                          choices: Map<int, String>.from(_selectedAnswers),
+                        ),
                       ),
+                    );
+                  }
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF6B73FF), Color(0xFF9B59B6)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                  );
-                }
-              },
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF6B73FF), Color(0xFF9B59B6)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF6B73FF).withOpacity(0.4),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
                   ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF6B73FF).withOpacity(0.4),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('✨', style: TextStyle(fontSize: 24)),
-                    SizedBox(width: 12),
-                    Text(
-                      'Create My Story',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('✨', style: TextStyle(fontSize: 24)),
+                      SizedBox(width: 12),
+                      Text(
+                        'Create My Story',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    SizedBox(width: 12),
-                    Text('✨', style: TextStyle(fontSize: 24)),
-                  ],
+                      SizedBox(width: 12),
+                      Text('✨', style: TextStyle(fontSize: 24)),
+                    ],
+                  ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
