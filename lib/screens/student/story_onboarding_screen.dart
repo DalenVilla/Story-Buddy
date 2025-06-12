@@ -126,7 +126,7 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
                 Text(
                   'How are you feeling right now?',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 34,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -168,20 +168,11 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
                   const Text('🎤', style: TextStyle(fontSize: 32)),
                   const SizedBox(height: 8),
                   const Text(
-                    'Pick the feeling that matches you today:',
+                    'Talk instead?',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 20,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF2D3436),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Want to tell us in your own words? Tap to speak!',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -251,9 +242,9 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
                 const Text('🌤️', style: TextStyle(fontSize: 48)),
                 const SizedBox(height: 16),
                 const Text(
-                  'If you were the weather, what would you be?',
+                  'What kind of weather are you?',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 34,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -313,9 +304,9 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
                 const Text('🧠', style: TextStyle(fontSize: 48)),
                 const SizedBox(height: 16),
                 const Text(
-                  'What happened earlier that made you feel this way?',
+                  'What happened?',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 34,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -336,9 +327,9 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
               mainAxisSpacing: 16,
               physics: const NeverScrollableScrollPhysics(),
                              children: [
-                 _buildChoiceCard('🧸', 'Someone helped or hurt me', 2, 0),
+                 _buildChoiceCard('🧸', 'Someone was mean', 2, 0),
                  _buildChoiceCard('🧪', 'Something broke', 2, 1),
-                 _buildChoiceCard('🎉', 'I had fun', 2, 2),
+                 _buildChoiceCard('🎉', 'Something fun', 2, 2),
                  _buildChoiceCard('😶', 'I don\'t know', 2, 3),
                ],
             ),
@@ -375,9 +366,9 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
                 const Text('💫', style: TextStyle(fontSize: 48)),
                 const SizedBox(height: 16),
                 const Text(
-                  'If you could change something about today, what would it be?',
+                  'Make today better?',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 34,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -462,7 +453,7 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
                     Text(
                       'Create My Story',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 30,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),

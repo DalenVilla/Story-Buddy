@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/gemini_service.dart';
+import 'dart:math' as math;
 
 /// Screen that presents a 6-slide choose-your-own-adventure story 📖✨
 /// Each slide shows an illustration (generated via backend), a paragraph,
@@ -14,7 +15,7 @@ class AdventureStoryScreen extends StatefulWidget {
   State<AdventureStoryScreen> createState() => _AdventureStoryScreenState();
 }
 
-class _AdventureStoryScreenState extends State<AdventureStoryScreen> {
+class _AdventureStoryScreenState extends State<AdventureStoryScreen> with SingleTickerProviderStateMixin {
   final GeminiService _geminiService = GeminiService();
 
   // Story data
@@ -26,9 +27,16 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> {
   String? _error;
   int _currentSlide = 0; // 0-based index
 
+  late AnimationController _loadingController;
+
   @override
   void initState() {
     super.initState();
+    _loadingController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    );
+    _loadingController.repeat(reverse: true);
     _fetchNextPart(); // fetch first slide
   }
 
@@ -37,6 +45,7 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> {
       _isLoading = true;
       _error = null;
     });
+    _loadingController.repeat(reverse: true);
 
     try {
       // 1. Get next paragraph + options from Gemini
@@ -64,11 +73,13 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> {
         _currentSlide = _paragraphs.length - 1;
         _isLoading = false;
       });
+      _loadingController.stop();
     } catch (e) {
       setState(() {
         _error = e.toString();
         _isLoading = false;
       });
+      _loadingController.stop();
     }
   }
 
@@ -93,11 +104,7 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> {
         centerTitle: true,
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation(Color(0xFF6B73FF)),
-              ),
-            )
+          ? _buildLoading()
           : _error != null
               ? _buildError()
               : _buildSlide(),
@@ -124,6 +131,36 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildLoading() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AnimatedBuilder(
+            animation: _loadingController,
+            builder: (context, child) {
+              final double offsetY = math.sin(_loadingController.value * 2 * math.pi) * 20;
+              return Transform.translate(
+                offset: Offset(0, offsetY),
+                child: child,
+              );
+            },
+            child: const Text('⭐', style: TextStyle(fontSize: 64)),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Making magic...',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF6B73FF),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -245,5 +282,11 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _loadingController.dispose();
+    super.dispose();
   }
 } 
