@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../services/gemini_service.dart';
+import 'story_result_screen.dart';
 
 class StoryGeneratingScreen extends StatefulWidget {
   final Map<int, String> choices;
@@ -10,6 +12,8 @@ class StoryGeneratingScreen extends StatefulWidget {
 
 class _StoryGeneratingScreenState extends State<StoryGeneratingScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  final GeminiService _geminiService = GeminiService();
+  String _statusText = 'Generating your story...';
 
   @override
   void initState() {
@@ -18,12 +22,68 @@ class _StoryGeneratingScreenState extends State<StoryGeneratingScreen> with Sing
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat();
+    
+    // Start generating the story
+    _generateStory();
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _generateStory() async {
+    try {
+      setState(() {
+        _statusText = 'Connecting to AI...';
+      });
+
+      // You can customize these parameters based on your app's needs
+      final story = await _geminiService.generateStory(
+        choices: widget.choices,
+        age: '6-10 years old', // You might want to get this from user input
+        theme: 'Adventure', // You might want to get this from user input
+      );
+
+      // Navigate to the story result screen
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => StoryResultScreen(
+              story: story,
+              choices: widget.choices,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      // Handle errors
+      if (mounted) {
+        setState(() {
+          _statusText = 'Oops! Something went wrong. Please try again.';
+        });
+        
+        // Show error dialog
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: Text('Failed to generate story: ${e.toString()}'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close dialog
+                  Navigator.pop(context); // Go back to previous screen
+                },
+                child: const Text('Try Again'),
+              ),
+            ],
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -63,38 +123,27 @@ class _StoryGeneratingScreenState extends State<StoryGeneratingScreen> with Sing
               ),
             ),
             const SizedBox(height: 32),
-            const Text(
-              'Generating your story...',
-              style: TextStyle(
+            Text(
+              _statusText,
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF6B73FF),
               ),
               textAlign: TextAlign.center,
             ),
-const SizedBox(height: 24),
-
-// Debug: Show choices map DELETE THIS LATER
-Container(
-  width: 320,
-  padding: const EdgeInsets.all(12),
-  margin: const EdgeInsets.only(top: 12),
-  decoration: BoxDecoration(
-    color: Colors.black.withOpacity(0.05),
-    borderRadius: BorderRadius.circular(12),
-  ),
-  child: Text(
-    'DEBUG: ${widget.choices}',
-    style: const TextStyle(
-      fontSize: 14,
-      color: Colors.black87,
-      fontFamily: 'monospace',
-    ),
-  ),
-),
-
-
-         ],
+            const SizedBox(height: 24),
+            
+            // Show a subtitle with helpful information
+            Text(
+              'Please wait while we create something magical for you!',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );
