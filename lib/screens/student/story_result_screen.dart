@@ -28,6 +28,7 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
   bool _isGeneratingImage = true;
   String? _imageError;
   bool _storySaved = false;
+  bool _isGeneratingTitle = false;
 
   @override
   void initState() {
@@ -53,9 +54,12 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
         _imageError = null;
       });
 
+      // Clean the story content to remove any JSON formatting
+      String cleanedStory = _cleanStoryContent(widget.story);
+
       // Generate image using your custom backend API
       final imageUrl = await _geminiService.generateImageFromStory(
-        story: widget.story,
+        story: cleanedStory,
       );
 
       if (mounted) {
@@ -65,7 +69,7 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
         });
         
         // Save the story with the generated image
-        await _saveStory(imageUrl);
+        await _saveStory(imageUrl, cleanedStory);
       }
     } catch (e) {
       if (mounted) {
@@ -75,22 +79,41 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
         });
         
         // Save the story even without an image
-        await _saveStory(null);
+        await _saveStory(null, _cleanStoryContent(widget.story));
       }
     }
   }
 
-  Future<void> _saveStory(String? imageUrl) async {
+  Future<void> _saveStory(String? imageUrl, [String? cleanedStoryContent]) async {
     if (_storySaved) return; // Prevent duplicate saves
     
     try {
       final currentUser = await UserService.getCurrentUserName();
       print('Saving story for user: $currentUser');
       
+      // Generate AI-powered title for the story
+      setState(() {
+        _isGeneratingTitle = true;
+      });
+      
+      String aiGeneratedTitle;
+      try {
+        print('Generating AI title for story...');
+        aiGeneratedTitle = await _geminiService.generateStoryTitle(story: widget.story);
+        print('Generated title: $aiGeneratedTitle');
+      } catch (e) {
+        print('Failed to generate AI title, using fallback: $e');
+        aiGeneratedTitle = Story.generateTitle(widget.story);
+      }
+      
+      setState(() {
+        _isGeneratingTitle = false;
+      });
+      
       final story = Story(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
-        title: Story.generateTitle(widget.story),
-        content: widget.story,
+        title: aiGeneratedTitle,
+        content: cleanedStoryContent ?? _cleanStoryContent(widget.story),
         imageUrl: imageUrl,
         choices: widget.choices,
         createdAt: DateTime.now(),
@@ -102,7 +125,7 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
         _storySaved = true;
       });
       
-      print('Story saved successfully for user: $currentUser');
+      print('Story saved successfully for user: $currentUser with title: $aiGeneratedTitle');
     } catch (e) {
       print('Error saving story: $e');
       // Continue even if saving fails - don't disrupt user experience
@@ -134,13 +157,30 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
             onPressed: () => Navigator.pop(context),
           ),
         ),
-        title: Text(
-          widget.existingStory != null ? widget.existingStory!.title : 'Your Story',
-          style: const TextStyle(
-            color: Color(0xFF2D3436),
-            fontWeight: FontWeight.w700,
-            fontSize: 24,
-          ),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                widget.existingStory != null ? widget.existingStory!.title : 'Your Story',
+                style: const TextStyle(
+                  color: Color(0xFF2D3436),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            if (_isGeneratingTitle) ...[
+              const SizedBox(width: 8),
+              const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B73FF)),
+                ),
+              ),
+            ],
+          ],
         ),
         centerTitle: true,
       ),
@@ -215,7 +255,7 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
                       if (_isGeneratingImage || _imageError != null || _imageUrl != null)
                         _buildImageSection(),
                       
-                      // Show creation date for existing stories
+                      // Show creation date for existing stories OR title generation status
                       if (widget.existingStory != null) ...[
                         const SizedBox(height: 16),
                         Container(
@@ -237,6 +277,36 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ] else if (_isGeneratingTitle) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF6B73FF).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B73FF)),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                'Creating the perfect title for your story...',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: const Color(0xFF6B73FF),
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ],
@@ -583,5 +653,24 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
     } else {
       return 'Just now';
     }
+  }
+
+  String _cleanStoryContent(String storyContent) {
+    // Remove any JSON formatting that might have been added to the story
+    String cleaned = storyContent;
+    
+    // Remove JSON patterns like {"story_name": "..."} or similar
+    cleaned = cleaned.replaceAll(RegExp(r'\{[^}]*"story_name"[^}]*\}'), '');
+    cleaned = cleaned.replaceAll(RegExp(r'\{[^}]*"title"[^}]*\}'), '');
+    cleaned = cleaned.replaceAll(RegExp(r'\{[^}]*"name"[^}]*\}'), '');
+    
+    // Remove any other JSON-like patterns
+    cleaned = cleaned.replaceAll(RegExp(r'\{[^}]*\}'), '');
+    
+    // Clean up extra whitespace and newlines
+    cleaned = cleaned.replaceAll(RegExp(r'\n\s*\n'), '\n\n');
+    cleaned = cleaned.trim();
+    
+    return cleaned;
   }
 } 

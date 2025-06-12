@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 
 class GeminiService {
   static const String _baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
-  static const String _baseImageUrl = 'https://generativelanguage.googleapis.com/v1beta/models/imagegeneration:generateContent';
 
   // Load API key from environment variable
   static String get _apiKey => dotenv.env['GEM_API'] ?? '';
@@ -152,9 +151,121 @@ Write at a reading level for a 6-year-old:
 Keep the tone warm, playful, and emotionally supportive.
 
 **Create something completely fresh and new. Only return the story text itself. Do not explain, introduce, or summarize it.**
+
+Do not include any JSON, titles, or additional formatting. Just return the pure story text.
 ''';
   }
   
+  Future<String> generateStoryTitle({
+    required String story,
+  }) async {
+    try {
+      final prompt = '''
+You are a creative title generator for children's stories. 
+
+Given this story:
+"$story"
+
+Create a short, magical, kid-friendly title (3-6 words maximum) that captures the essence of the story.
+
+Requirements:
+- Simple words a 6-year-old can understand
+- Magical and engaging
+- No more than 6 words
+- Should make kids excited to read/hear the story
+- Avoid generic titles like "The Story of..." or "A Tale of..."
+
+Examples of good titles:
+- "Luna's Magic Garden"
+- "The Singing Tree"
+- "Rainbow Bridge Adventure"
+- "Sparkle the Brave Dragon"
+
+Return ONLY the title, nothing else.
+''';
+
+      final response = await http.post(
+        Uri.parse('$_baseUrl?key=$_apiKey'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'contents': [{
+            'parts': [{
+              'text': prompt
+            }]
+          }],
+          'generationConfig': {
+            'temperature': 0.8,
+            'topK': 40,
+            'topP': 0.9,
+            'maxOutputTokens': 50,
+            'candidateCount': 1,
+          },
+          'safetySettings': [
+            {
+              'category': 'HARM_CATEGORY_HARASSMENT',
+              'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              'category': 'HARM_CATEGORY_HATE_SPEECH',
+              'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              'category': 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+              'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              'category': 'HARM_CATEGORY_DANGEROUS_CONTENT',
+              'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+            }
+          ]
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        
+        if (data['candidates'] != null && 
+            data['candidates'].isNotEmpty &&
+            data['candidates'][0]['content'] != null &&
+            data['candidates'][0]['content']['parts'] != null &&
+            data['candidates'][0]['content']['parts'].isNotEmpty) {
+          
+          String title = data['candidates'][0]['content']['parts'][0]['text'].trim();
+          
+          // Remove any JSON formatting
+          title = title.replaceAll(RegExp(r'\{[^}]*\}'), '');
+          title = title.replaceAll(RegExp(r'\[[^\]]*\]'), '');
+          
+          // Remove quotes if present
+          title = title.replaceAll('"', '').replaceAll("'", '');
+          
+          // Remove common unwanted prefixes/suffixes
+          title = title.replaceAll(RegExp(r'^(Title:|Story Title:|Name:)\s*', caseSensitive: false), '');
+          
+          // Clean up extra whitespace
+          title = title.replaceAll(RegExp(r'\s+'), ' ').trim();
+          
+          // Ensure it's not too long
+          if (title.split(' ').length > 6) {
+            title = title.split(' ').take(6).join(' ');
+          }
+          
+          return title.isNotEmpty ? title : 'My Magical Story';
+        } else {
+          return 'My Magical Story';
+        }
+      } else {
+        print('Error generating title: ${response.statusCode} - ${response.body}');
+        return 'My Magical Story';
+      }
+    } catch (e) {
+      print('Error generating story title: $e');
+      return 'My Magical Story';
+    }
+  }
+
   Future<String> generateImageFromStory({
     required String story,
   }) async {
