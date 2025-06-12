@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class GeminiService {
   static const String _baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
-  
+  static const String _baseImageUrl = 'https://generativelanguage.googleapis.com/v1beta/models/imagegeneration:generateContent';
 
-  // TODO: REMOVE THIS BRUH .. 
-  static const String _apiKey = 'AIzaSyAKvtFZ4-2nsnSxQAsqxsDnU3gb6Cgwxf8';
+  // Load API key from environment variable
+  static String get _apiKey => dotenv.env['GEM_API'] ?? '';
+  static String get _backendApiKey => dotenv.env['BACKEND_API'] ?? '';
   
   Future<String> generateStory({
     required Map<int, String> choices,
@@ -153,7 +155,7 @@ then finally create an image of the whole story.
     try {
       // Step 1: Request image generation from your backend
       final response = await http.post(
-        Uri.parse('https://story-buddy-backend.onrender.com/get_image?api=80db1976-0000-4491-a9bb-0e64a7b1f18az'),
+        Uri.parse('https://story-buddy-backend.onrender.com/get_image?api=$_backendApiKey'),
         headers: {
           'Content-Type': 'application/json',
         },

@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:story_buddy/screens/main_screen.dart';
 
-void main() {
+void main() async {
+  // Ensure Flutter is initialized
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Load environment variables from .env file
+  await dotenv.load(fileName: ".env");
+  
   runApp(const MyApp());
 }
 
