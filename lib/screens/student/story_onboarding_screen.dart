@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'story_generating_screen.dart';
 
 class StoryOnboardingScreen extends StatefulWidget {
   const StoryOnboardingScreen({super.key});
@@ -412,13 +413,12 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
                _selectedAnswers[3] != null)
             GestureDetector(
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('🎉 Creating your amazing story!'),
-                    backgroundColor: Color(0xFF6B73FF),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => StoryGeneratingScreen(choices: Map<int, String>.from(_selectedAnswers)),
                   ),
                 );
-                Navigator.pop(context);
               },
               child: Container(
                 width: double.infinity,
