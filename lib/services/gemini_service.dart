@@ -146,4 +146,41 @@ Keep the tone warm, playful, and emotionally supportive.
 then finally create an image of the whole story.
 ''';
   }
+  
+  Future<String> generateImageFromStory({
+    required String story,
+  }) async {
+    try {
+      // Step 1: Request image generation from your backend
+      final response = await http.post(
+        Uri.parse('https://story-buddy-backend.onrender.com/get_image?api=80db1976-0000-4491-a9bb-0e64a7b1f18az'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'image_desc': story,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        
+        // Step 2: Extract the image_id from the response
+        if (data['image_id'] != null) {
+          final imageId = data['image_id'];
+          
+          // Step 3: Construct the full image URL using the image_id
+          final imageUrl = 'https://story-buddy-backend.onrender.com/images/$imageId';
+          
+          return imageUrl;
+        } else {
+          throw Exception('No image_id received from backend');
+        }
+      } else {
+        throw Exception('Failed to generate image: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error generating image: $e');
+    }
+  }
 } 
