@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../components/student/student_app_bar.dart';
 import '../../components/student/student_home_content.dart';
 import '../../components/student/student_bottom_nav_bar.dart';
-import 'student_library_screen.dart';
+import 'story_library_screen.dart';
 import 'student_profile_screen.dart';
 
 class StorytimeHomeScreen extends StatefulWidget {
@@ -46,8 +46,8 @@ class _StorytimeHomeScreenState extends State<StorytimeHomeScreen> {
           classEmotions: classEmotions,
         ),
       ),
-      // Library page
-      const StudentLibraryScreen(),
+                    // Library page
+              const StoryLibraryScreen(),
       // Profile page
       StudentProfileScreen(
         studentName: widget.studentName,

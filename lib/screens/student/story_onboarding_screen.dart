@@ -404,8 +404,12 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
           
           const SizedBox(height: 24),
           
-          // Create Story button (only shows when answer is selected)
-          if (_selectedAnswers[3] != null)
+                     // Create Story button (only shows when all answers are selected)
+           if (_selectedAnswers.length == 4 && 
+               _selectedAnswers[0] != null && 
+               _selectedAnswers[1] != null && 
+               _selectedAnswers[2] != null && 
+               _selectedAnswers[3] != null)
             GestureDetector(
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
