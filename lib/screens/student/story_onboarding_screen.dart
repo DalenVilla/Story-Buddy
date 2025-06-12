@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'story_generating_screen.dart';
+import 'speech_recording_screen.dart';
 
 class StoryOnboardingScreen extends StatefulWidget {
   const StoryOnboardingScreen({super.key});
@@ -138,10 +139,10 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
           // Voice button
           GestureDetector(
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('🎤 Voice recording coming soon!'),
-                  backgroundColor: Color(0xFFFF6B6B),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SpeechRecordingScreen(),
                 ),
               );
             },
