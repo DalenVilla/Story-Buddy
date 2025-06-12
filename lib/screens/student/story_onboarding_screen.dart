@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'story_generating_screen.dart';
 import 'speech_recording_screen.dart';
+import 'adventure_story_screen.dart';
 
 class StoryOnboardingScreen extends StatefulWidget {
-  const StoryOnboardingScreen({super.key});
+  final bool isAdventure;
+  const StoryOnboardingScreen({super.key, this.isAdventure = false});
 
   @override
   State<StoryOnboardingScreen> createState() => _StoryOnboardingScreenState();
@@ -414,12 +416,25 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
                _selectedAnswers[3] != null)
             GestureDetector(
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => StoryGeneratingScreen(choices: Map<int, String>.from(_selectedAnswers)),
-                  ),
-                );
+                if (widget.isAdventure) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdventureStoryScreen(
+                        choices: Map<int, String>.from(_selectedAnswers),
+                      ),
+                    ),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => StoryGeneratingScreen(
+                        choices: Map<int, String>.from(_selectedAnswers),
+                      ),
+                    ),
+                  );
+                }
               },
               child: Container(
                 width: double.infinity,

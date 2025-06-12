@@ -302,4 +302,116 @@ Return ONLY the title, nothing else.
       throw Exception('Error generating image: $e');
     }
   }
+
+  Future<Map<String, dynamic>> generateAdventurePart({
+    required List<String> storySoFar,
+    String? lastChoice,
+  }) async {
+    try {
+      final storyContext = storySoFar.isEmpty ? '(start)' : storySoFar.join('\n');
+      final choiceText = (lastChoice ?? '').isEmpty ? 'None (first part)' : lastChoice;
+      final prompt = '''
+You are a playful storyteller for children.
+Story so far:
+$storyContext
+
+The child chose: "$choiceText"
+
+Write the next part of the adventure:
+- One short paragraph (1-3 sentences)
+- Each sentence 10 words or fewer
+- Use only 1-3 syllable words
+- Keep it magical and kind
+
+After the paragraph, list three choices for what the hero can do next.
+
+Return ONLY valid JSON exactly in this format:
+{
+  "paragraph": "<paragraph>",
+  "options": ["choice one", "choice two", "choice three"]
+}
+''';
+
+      final response = await http.post(
+        Uri.parse('$_baseUrl?key=$_apiKey'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'contents': [
+            {
+              'parts': [
+                {'text': prompt}
+              ]
+            }
+          ],
+          'generationConfig': {
+            'temperature': 0.9,
+            'topK': 40,
+            'topP': 0.9,
+            'maxOutputTokens': 256,
+            'candidateCount': 1,
+          },
+          'safetySettings': [
+            {
+              'category': 'HARM_CATEGORY_HARASSMENT',
+              'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              'category': 'HARM_CATEGORY_HATE_SPEECH',
+              'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              'category': 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+              'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              'category': 'HARM_CATEGORY_DANGEROUS_CONTENT',
+              'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+            }
+          ]
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['candidates'] != null &&
+            data['candidates'].isNotEmpty &&
+            data['candidates'][0]['content'] != null &&
+            data['candidates'][0]['content']['parts'] != null &&
+            data['candidates'][0]['content']['parts'].isNotEmpty) {
+          final text = data['candidates'][0]['content']['parts'][0]['text'];
+          // Attempt to locate first JSON block in text
+          final jsonMatch = RegExp(r'\{[\s\S]*\}').firstMatch(text);
+          if (jsonMatch != null) {
+            final jsonString = jsonMatch.group(0);
+            if (jsonString != null) {
+              final parsed = jsonDecode(jsonString);
+              // Validate structure
+              if (parsed is Map && parsed['paragraph'] != null && parsed['options'] is List) {
+                return {
+                  'paragraph': parsed['paragraph'] as String,
+                  'options': List<String>.from(parsed['options'] as List),
+                };
+              }
+            }
+          }
+          // Fallback: treat entire text as paragraph and split lines for options
+          final lines = text.trim().split('\n');
+          final paragraph = lines.first.trim();
+          final options = lines.skip(1).where((l) => l.trim().isNotEmpty).take(3).map((e) => e.replaceAll(RegExp(r'^[0-9]+[).\-]\s*'), '').trim()).toList();
+          return {
+            'paragraph': paragraph,
+            'options': options.isNotEmpty ? options : ['Continue', 'Look around', 'Ask for help'],
+          };
+        } else {
+          throw Exception('No content from Gemini');
+        }
+      } else {
+        throw Exception('Gemini API error: ${response.statusCode} ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error generating adventure part: $e');
+    }
+  }
 } 

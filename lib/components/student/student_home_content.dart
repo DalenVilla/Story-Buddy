@@ -111,14 +111,37 @@ class StorytimeHomeContent extends StatelessWidget {
                 emoji: '✏️',
                 title: 'Write Story',
                 color: const Color(0xFF6B73FF),
-                                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const StoryOnboardingScreen(),
-                      ),
-                    );
-                  },
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const StoryOnboardingScreen(),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          
+          const SizedBox(height: 20),
+          
+          // Quick action button - Create Adventure
+          Center(
+            child: Container(
+              width: double.infinity,
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: _buildBigActionButton(
+                emoji: '🗺️',
+                title: 'Create Adventure',
+                color: const Color(0xFF9B59B6),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const StoryOnboardingScreen(isAdventure: true),
+                    ),
+                  );
+                },
               ),
             ),
           ),
