@@ -1,7 +1,65 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import '../../models/story.dart';
+import '../../services/story_storage_service.dart';
+import '../../services/story_event_service.dart';
+import 'story_onboarding_screen.dart';
+import 'story_result_screen.dart';
 
-class StoryLibraryScreen extends StatelessWidget {
+class StoryLibraryScreen extends StatefulWidget {
   const StoryLibraryScreen({super.key});
+
+  @override
+  State<StoryLibraryScreen> createState() => _StoryLibraryScreenState();
+}
+
+class _StoryLibraryScreenState extends State<StoryLibraryScreen> {
+  List<Story> _userStories = [];
+  bool _isLoading = true;
+  StreamSubscription<void>? _storyUpdateSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserStories();
+    
+    // Listen for story updates
+    _storyUpdateSubscription = StoryEventService.onStoryUpdated.listen((_) {
+      _loadUserStories();
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Refresh stories when widget comes into view
+    _loadUserStories();
+  }
+
+  @override
+  void dispose() {
+    _storyUpdateSubscription?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadUserStories() async {
+    try {
+      final stories = await StoryStorageService.getStories();
+      if (mounted) {
+        setState(() {
+          _userStories = stories.reversed.toList(); // Show newest first
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading stories: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -168,43 +226,7 @@ class StoryLibraryScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             
-            SizedBox(
-              height: 240,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  _buildStoryCard(
-                    'Coming Soon!',
-                    _buildComingSoonIllustration(),
-                    const LinearGradient(
-                      colors: [Color(0xFFFFF59D), Color(0xFFFFEB3B)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  _buildStoryCard(
-                    'Story #2',
-                    _buildComingSoonIllustration(),
-                    const LinearGradient(
-                      colors: [Color(0xFFE1BEE7), Color(0xFFBA68C8)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  _buildStoryCard(
-                    'Story #3',
-                    _buildComingSoonIllustration(),
-                    const LinearGradient(
-                      colors: [Color(0xFFB39DDB), Color(0xFF9575CD)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            _buildMyStoriesSection(),
             
                          const SizedBox(height: 32),
                        ],
@@ -218,6 +240,230 @@ class StoryLibraryScreen extends StatelessWidget {
        ),
      );
    }
+
+  Widget _buildMyStoriesSection() {
+    if (_isLoading) {
+      return const SizedBox(
+        height: 240,
+        child: Center(
+          child: CircularProgressIndicator(
+            color: Color(0xFF6B73FF),
+          ),
+        ),
+      );
+    }
+
+    if (_userStories.isEmpty) {
+      return SizedBox(
+        height: 240,
+        child: Center(
+          child: Container(
+            width: 200,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6B73FF).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Icon(
+                    Icons.auto_stories_outlined,
+                    size: 48,
+                    color: Color(0xFF6B73FF),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'No stories yet!',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D3436),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Create your first magical story',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const StoryOnboardingScreen(),
+                        ),
+                      ).then((_) {
+                        // Refresh stories when returning from story creation
+                        _loadUserStories();
+                      });
+                    },
+                    icon: const Icon(Icons.add, size: 20),
+                    label: const Text(
+                      'Create Story',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6B73FF),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 4,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: 240,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: _userStories.length,
+        itemBuilder: (context, index) {
+          final story = _userStories[index];
+          return Padding(
+            padding: EdgeInsets.only(right: index < _userStories.length - 1 ? 16 : 0),
+            child: _buildUserStoryCard(story),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildUserStoryCard(Story story) {
+    return GestureDetector(
+      onTap: () {
+        // Open the existing story in result screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => StoryResultScreen(
+              story: story.content,
+              choices: story.choices,
+              existingStory: story, // Pass the existing story
+            ),
+          ),
+        );
+      },
+      child: Container(
+        width: 160,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF6B73FF), Color(0xFF9B59B6)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+            BoxShadow(
+              color: Colors.white.withOpacity(0.8),
+              blurRadius: 8,
+              offset: const Offset(-2, -2),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Story illustration/image
+              Expanded(
+                flex: 4,
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: story.imageUrl != null
+                        ? Image.network(
+                            story.imageUrl!,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                padding: const EdgeInsets.all(20),
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Color(0xFF6B73FF),
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                padding: const EdgeInsets.all(20),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.auto_stories_outlined,
+                                    size: 40,
+                                    color: Color(0xFF6B73FF),
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        : Container(
+                            padding: const EdgeInsets.all(20),
+                            child: const Center(
+                              child: Icon(
+                                Icons.auto_stories_outlined,
+                                size: 40,
+                                color: Color(0xFF6B73FF),
+                              ),
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // Title
+              Text(
+                story.title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _buildStoryCard(String title, Widget illustration, LinearGradient gradient) {
     return Container(

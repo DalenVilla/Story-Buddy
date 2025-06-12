@@ -90,26 +90,33 @@ class GeminiService {
     final random = Random();
     final randomSeed = random.nextInt(10000);
     
-    // Vary the story opening styles
-    final openings = [
-      '"Once upon a time…"',
-      '"In a land where clouds could sing…"',
-      '"Deep in a magical forest…"',
-      '"On a sunny morning when anything was possible…"',
-      '"In a world filled with wonder…"',
-      '"Long ago in a place where dreams come true…"',
-    ];
+
     
-    final selectedOpening = openings[random.nextInt(openings.length)];
     
     // Vary the magical elements mentioned
-    final magicalElements = [
-      'talking animals, enchanted places, dreamlike elements',
-      'friendly magical creatures, mysterious doors, floating objects',
-      'singing flowers, dancing trees, shimmering portals',
-      'wise animals, magical gardens, glowing pathways',
-      'helpful sprites, rainbow bridges, whispering winds',
-    ];
+final magicalElements = [
+  'talking animals, enchanted places, dreamlike elements',
+  'friendly magical creatures, mysterious doors, floating objects',
+  'singing flowers, dancing trees, shimmering portals',
+  'wise animals, magical gardens, glowing pathways',
+  'helpful sprites, rainbow bridges, whispering winds',
+  'crystal caves, gentle giants, hidden treasure maps',
+  'playful fairies, moonlit rivers, starlit lanterns',
+  'mischievous pixies, secret tunnels, glowing mushrooms',
+  'dragon hatchlings, floating islands, silver waterfalls',
+  'time-twisting clocks, echoing chambers, glowing runes',
+  'cloud-castle towers, friendly griffins, winding staircases',
+  'living books, whispering trees, glowing star-dust',
+  'shape-shifting shadows, crystal butterflies, magic wands',
+  'dancing fireflies, enchanted instruments, talking stones',
+  'whispering seashells, coral archways, mermaid friends',
+  'floating lanterns, hidden doorways, magical inkpots',
+  'glowing runes, ancient guardians, secret staircases',
+  'midnight meadows, glowing dewdrops, talking owls',
+  'mirror lakes, friendly water sprites, glowing lotus',
+  'hidden treehouses, singing wind chimes, moonbeam paths',
+];
+
     
     final selectedMagical = magicalElements[random.nextInt(magicalElements.length)];
     
@@ -139,14 +146,12 @@ Write at a reading level for a 6-year-old:
 - Use gentle and clear ideas they can easily understand
 - No complex metaphors or long dialogue
 - No introduction or explanation — **just return the story only**
-- Use 1-2 syllable words ONLY.
+- Use 1-3 syllable words ONLY.
 
-Begin the story with an inviting line like: $selectedOpening
 
 Keep the tone warm, playful, and emotionally supportive.
 
 **Create something completely fresh and new. Only return the story text itself. Do not explain, introduce, or summarize it.**
-then finally create an image of the whole story.
 ''';
   }
   

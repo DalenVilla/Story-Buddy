@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import '../../services/gemini_service.dart';
+import '../../models/story.dart';
+import '../../services/story_storage_service.dart';
+import '../../services/user_service.dart';
+import 'student_home_screen.dart';
 
 class StoryResultScreen extends StatefulWidget {
   final String story;
   final Map<int, String> choices;
+  final Story? existingStory; // If provided, this is viewing an existing story
 
   const StoryResultScreen({
     super.key,
     required this.story,
     required this.choices,
+    this.existingStory, // Optional - for viewing existing stories
   });
 
   @override
@@ -21,11 +27,23 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
   String? _imageUrl;
   bool _isGeneratingImage = true;
   String? _imageError;
+  bool _storySaved = false;
 
   @override
   void initState() {
     super.initState();
-    _generateStoryImage();
+    
+    // Only generate new image and save if this is a new story
+    if (widget.existingStory == null) {
+      _generateStoryImage();
+    } else {
+      // This is an existing story, use the stored image
+      setState(() {
+        _imageUrl = widget.existingStory!.imageUrl;
+        _isGeneratingImage = false;
+        _storySaved = true; // Already saved
+      });
+    }
   }
 
   Future<void> _generateStoryImage() async {
@@ -45,6 +63,9 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
           _imageUrl = imageUrl;
           _isGeneratingImage = false;
         });
+        
+        // Save the story with the generated image
+        await _saveStory(imageUrl);
       }
     } catch (e) {
       if (mounted) {
@@ -52,7 +73,39 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
           _imageError = e.toString();
           _isGeneratingImage = false;
         });
+        
+        // Save the story even without an image
+        await _saveStory(null);
       }
+    }
+  }
+
+  Future<void> _saveStory(String? imageUrl) async {
+    if (_storySaved) return; // Prevent duplicate saves
+    
+    try {
+      final currentUser = await UserService.getCurrentUserName();
+      print('Saving story for user: $currentUser');
+      
+      final story = Story(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: Story.generateTitle(widget.story),
+        content: widget.story,
+        imageUrl: imageUrl,
+        choices: widget.choices,
+        createdAt: DateTime.now(),
+      );
+      
+      await StoryStorageService.saveStory(story);
+      
+      setState(() {
+        _storySaved = true;
+      });
+      
+      print('Story saved successfully for user: $currentUser');
+    } catch (e) {
+      print('Error saving story: $e');
+      // Continue even if saving fails - don't disrupt user experience
     }
   }
 
@@ -81,9 +134,9 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
             onPressed: () => Navigator.pop(context),
           ),
         ),
-        title: const Text(
-          'Your Story',
-          style: TextStyle(
+        title: Text(
+          widget.existingStory != null ? widget.existingStory!.title : 'Your Story',
+          style: const TextStyle(
             color: Color(0xFF2D3436),
             fontWeight: FontWeight.w700,
             fontSize: 24,
@@ -161,6 +214,35 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
                       
                       if (_isGeneratingImage || _imageError != null || _imageUrl != null)
                         _buildImageSection(),
+                      
+                      // Show creation date for existing stories
+                      if (widget.existingStory != null) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.access_time,
+                                size: 16,
+                                color: Colors.grey[600],
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Created ${_formatDate(widget.existingStory!.createdAt)}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -184,8 +266,25 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
                         ],
                       ),
                       child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.popUntil(context, (route) => route.isFirst);
+                        onPressed: () async {
+                          // Get current user info to navigate to proper home
+                          final userName = await UserService.getCurrentUserName();
+                          
+                          if (userName != null) {
+                            // Navigate to student home screen
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => StorytimeHomeScreen(
+                                  studentName: userName,
+                                ),
+                              ),
+                              (route) => false, // Remove all previous routes
+                            );
+                          } else {
+                            // Fallback: just pop back
+                            Navigator.pop(context);
+                          }
                         },
                         icon: const Icon(Icons.home_rounded, size: 20),
                         label: const Text(
@@ -378,19 +477,22 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
-          TextButton.icon(
-            onPressed: _generateStoryImage,
-            icon: const Icon(Icons.refresh_rounded, size: 18),
-            label: const Text(
-              'Try Again',
-              style: TextStyle(fontWeight: FontWeight.w600),
+          // Only show Try Again for new stories, not existing ones
+          if (widget.existingStory == null) ...[
+            const SizedBox(height: 16),
+            TextButton.icon(
+              onPressed: _generateStoryImage,
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: const Text(
+                'Try Again',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF6B73FF),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              ),
             ),
-            style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFF6B73FF),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            ),
-          ),
+          ],
         ],
       ),
     );
@@ -466,5 +568,20 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
         ),
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+    
+    if (difference.inDays > 0) {
+      return '${difference.inDays} day${difference.inDays == 1 ? '' : 's'} ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} hour${difference.inHours == 1 ? '' : 's'} ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes} minute${difference.inMinutes == 1 ? '' : 's'} ago';
+    } else {
+      return 'Just now';
+    }
   }
 } 

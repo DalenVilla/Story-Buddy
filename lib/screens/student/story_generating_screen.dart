@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/gemini_service.dart';
+import '../../services/user_service.dart';
 import 'story_result_screen.dart';
 
 class StoryGeneratingScreen extends StatefulWidget {

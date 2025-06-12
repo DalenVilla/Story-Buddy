@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../components/student/student_app_bar.dart';
 import '../../components/student/student_home_content.dart';
 import '../../components/student/student_bottom_nav_bar.dart';
+import '../../services/user_service.dart';
 import 'story_library_screen.dart';
 import 'student_profile_screen.dart';
 
@@ -25,6 +26,13 @@ class _StorytimeHomeScreenState extends State<StorytimeHomeScreen> {
   int _currentIndex = 0;
 
   @override
+  void initState() {
+    super.initState();
+    // Set current user when home screen loads
+    UserService.setCurrentUser(widget.studentName, userType: 'student');
+  }
+
+  @override
   Widget build(BuildContext context) {
     const classEmotions = [
       {'name': 'Bravery', 'emoji': '💪', 'color': Colors.red},
@@ -46,8 +54,8 @@ class _StorytimeHomeScreenState extends State<StorytimeHomeScreen> {
           classEmotions: classEmotions,
         ),
       ),
-                    // Library page
-              const StoryLibraryScreen(),
+                    // Library page - create new instance each time to ensure fresh data
+              StoryLibraryScreen(key: ValueKey(_currentIndex)),
       // Profile page
       StudentProfileScreen(
         studentName: widget.studentName,
