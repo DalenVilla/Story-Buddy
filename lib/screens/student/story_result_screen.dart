@@ -32,11 +32,18 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
   bool _storySaved = false;
   bool _isGeneratingTitle = false;
   bool _isSpeaking = false;
+  
+  // For word highlighting during speech
+  List<Map<String, dynamic>> _storySegments = [];
+  int _currentWordIndex = -1;
+  String _cleanedStoryForDisplay = "";
+  int _highlightUpdateCounter = 0;
 
   @override
   void initState() {
     super.initState();
     _initializeTts();
+    _prepareStoryForHighlighting();
     
     // Only generate new image and save if this is a new story
     if (widget.existingStory == null) {
@@ -49,6 +56,147 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
         _storySaved = true; // Already saved
       });
     }
+  }
+
+  void _prepareStoryForHighlighting() {
+    _cleanedStoryForDisplay = _cleanStoryContent(widget.story);
+    _storySegments = _parseStoryIntoSegments(_cleanedStoryForDisplay);
+  }
+
+  List<Map<String, dynamic>> _parseStoryIntoSegments(String story) {
+    List<Map<String, dynamic>> segments = [];
+    
+    // Split by paragraphs first to preserve structure
+    List<String> paragraphs = story.split('\n\n');
+    int globalWordIndex = 0;
+    
+    for (int paragraphIndex = 0; paragraphIndex < paragraphs.length; paragraphIndex++) {
+      String paragraph = paragraphs[paragraphIndex].trim();
+      if (paragraph.isEmpty) continue;
+      
+      // Add paragraph break if not the first paragraph
+      if (paragraphIndex > 0) {
+        segments.add({
+          'type': 'paragraph_break',
+          'content': '\n\n',
+          'wordIndex': -1,
+        });
+      }
+      
+      // Split paragraph into words
+      List<String> words = paragraph.split(RegExp(r'\s+'));
+      words.removeWhere((word) => word.trim().isEmpty);
+      
+      for (int wordIndex = 0; wordIndex < words.length; wordIndex++) {
+        String word = words[wordIndex];
+        
+        segments.add({
+          'type': 'word',
+          'content': word,
+          'wordIndex': globalWordIndex,
+          'isLastInParagraph': wordIndex == words.length - 1,
+        });
+        
+        // Add space after word (except last word in paragraph)
+        if (wordIndex < words.length - 1) {
+          segments.add({
+            'type': 'space',
+            'content': ' ',
+            'wordIndex': -1,
+          });
+        }
+        
+        globalWordIndex++;
+      }
+    }
+    
+    return segments;
+  }
+
+  void _startWordHighlighting() {
+    // Estimate timing for word highlighting (since TTS progress might not be available)
+    int totalWords = _storySegments.where((seg) => seg['type'] == 'word').length;
+    if (totalWords > 0) {
+      _simulateWordProgress();
+    }
+  }
+
+  void _simulateWordProgress() async {
+    // Calculate approximate timing based on speech rate and word count
+    double wordsPerSecond = 2.0; // Slower to reduce glitching
+    int totalWords = _storySegments.where((seg) => seg['type'] == 'word').length;
+    double intervalMs = (1000 / wordsPerSecond);
+    
+    for (int i = 0; i < totalWords && _isSpeaking; i++) {
+      await Future.delayed(Duration(milliseconds: intervalMs.round()));
+      if (_isSpeaking && mounted) {
+        // Throttle updates to reduce glitching
+        _highlightUpdateCounter++;
+        if (_highlightUpdateCounter % 2 == 0) { // Update every other cycle
+          setState(() {
+            _currentWordIndex = i;
+          });
+        }
+      }
+    }
+  }
+
+  void _highlightWordByOffset(int startOffset, int endOffset) {
+    // This method handles TTS progress callbacks if available
+    String spokenText = _cleanedStoryForDisplay.substring(0, endOffset);
+    List<String> spokenWords = spokenText.split(RegExp(r'\s+'));
+    
+    if (mounted && spokenWords.isNotEmpty) {
+      setState(() {
+        _currentWordIndex = spokenWords.length - 1;
+      });
+    }
+  }
+
+  Widget _buildHighlightedStoryText() {
+    if (_storySegments.isEmpty) {
+      return Text(
+        widget.story,
+        style: const TextStyle(
+          fontSize: 17,
+          height: 1.7,
+          color: Color(0xFF2D3436),
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0.2,
+        ),
+      );
+    }
+
+    return RichText(
+      text: TextSpan(
+        style: const TextStyle(
+          fontSize: 17,
+          height: 1.7,
+          color: Color(0xFF2D3436),
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0.2,
+        ),
+        children: _storySegments.map((segment) {
+          if (segment['type'] == 'paragraph_break') {
+            return const TextSpan(text: '\n\n');
+          } else if (segment['type'] == 'space') {
+            return const TextSpan(text: ' ');
+          } else if (segment['type'] == 'word') {
+            bool isCurrentWord = segment['wordIndex'] == _currentWordIndex;
+            
+            return TextSpan(
+              text: segment['content'],
+              style: TextStyle(
+                fontWeight: isCurrentWord ? FontWeight.bold : FontWeight.w400,
+                backgroundColor: isCurrentWord ? Colors.orange.withOpacity(0.2) : null,
+                color: const Color(0xFF2D3436),
+              ),
+            );
+          }
+          return const TextSpan(text: '');
+        }).toList(),
+      ),
+    );
   }
 
   @override
@@ -73,13 +221,17 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
       print("TTS started speaking");
       setState(() {
         _isSpeaking = true;
+        _currentWordIndex = 0;
       });
+      _startWordHighlighting();
     });
 
     _flutterTts.setCompletionHandler(() {
       print("TTS completed speaking");
       setState(() {
         _isSpeaking = false;
+        _currentWordIndex = -1;
+        _highlightUpdateCounter = 0;
       });
     });
 
@@ -87,7 +239,15 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
       print("TTS error: $msg");
       setState(() {
         _isSpeaking = false;
+        _currentWordIndex = -1;
+        _highlightUpdateCounter = 0;
       });
+    });
+
+    // Try to set up progress handler for word-by-word highlighting
+    _flutterTts.setProgressHandler((String text, int startOffset, int endOffset, String word) {
+      print("TTS Progress: word='$word', start=$startOffset, end=$endOffset");
+      _highlightWordByOffset(startOffset, endOffset);
     });
   }
 
@@ -97,6 +257,8 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
       await _flutterTts.stop();
       setState(() {
         _isSpeaking = false;
+        _currentWordIndex = -1;
+        _highlightUpdateCounter = 0;
       });
     } else {
       // Use simple, reliable approach first
@@ -510,16 +672,7 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
                             width: 1,
                           ),
                         ),
-                        child: Text(
-                          widget.story,
-                          style: const TextStyle(
-                            fontSize: 17,
-                            height: 1.7,
-                            color: Color(0xFF2D3436),
-                            fontWeight: FontWeight.w400,
-                            letterSpacing: 0.2,
-                          ),
-                        ),
+                        child: _buildHighlightedStoryText(),
                       ),
                       
                       // Image section - naturally integrated
