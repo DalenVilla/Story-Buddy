@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'teacher_classes_screen.dart';
 
 class TeacherDashboardScreen extends StatelessWidget {
@@ -467,8 +469,9 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
     } else if (_currentStep == 1) {
       // Validate emotions selection
       if (_selectedEmotions.isNotEmpty) {
-        // Generate class code
+        // Generate class code and save class
         _generatedClassCode = _generateClassCode();
+        _saveClassToLocal();
         setState(() {
           _currentStep++;
         });
@@ -500,6 +503,49 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
         (DateTime.now().millisecondsSinceEpoch + index) % chars.length
       ))
     );
+  }
+
+  Future<void> _saveClassToLocal() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Create class data
+      final classData = {
+        'id': 'class_${DateTime.now().millisecondsSinceEpoch}',
+        'name': _classNameController.text.trim(),
+        'grade': _selectedGrade,
+        'classCode': _generatedClassCode,
+        'focusEmotions': _selectedEmotions,
+        'students': [], // Empty list for new class
+        'createdAt': DateTime.now().toIso8601String(),
+      };
+      
+      // Get existing classes
+      final existingClassesJson = prefs.getString('teacher_classes') ?? '[]';
+      final List<dynamic> existingClasses = jsonDecode(existingClassesJson);
+      
+      // Add new class
+      existingClasses.add(classData);
+      
+      // Save back to preferences
+      await prefs.setString('teacher_classes', jsonEncode(existingClasses));
+      
+      print('Class saved locally: ${classData['name']}');
+    } catch (e) {
+      print('Error saving class: $e');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getLocalClasses() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final classesJson = prefs.getString('teacher_classes') ?? '[]';
+      final List<dynamic> classesList = jsonDecode(classesJson);
+      return classesList.cast<Map<String, dynamic>>();
+    } catch (e) {
+      print('Error loading classes: $e');
+      return [];
+    }
   }
 
   @override
@@ -946,7 +992,7 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
         width: double.infinity,
         child: ElevatedButton(
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.of(context).pop('refresh');
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(

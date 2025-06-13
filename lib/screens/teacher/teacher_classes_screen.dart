@@ -1,9 +1,80 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'teacher_class_detail_screen.dart';
 import 'teacher_dashboard_screen.dart';
 
-class TeacherClassesScreen extends StatelessWidget {
+class TeacherClassesScreen extends StatefulWidget {
   const TeacherClassesScreen({super.key});
+
+  @override
+  State<TeacherClassesScreen> createState() => _TeacherClassesScreenState();
+}
+
+class _TeacherClassesScreenState extends State<TeacherClassesScreen> {
+  List<Map<String, dynamic>> _localClasses = [];
+  bool _isLoading = true;
+
+  // Hardcoded classes to show alongside local ones
+  final List<Map<String, dynamic>> _hardcodedClasses = [
+    {
+      'id': 'hardcoded_1',
+      'name': 'Morning Reading',
+      'grade': '3rd Grade',
+      'students': 12,
+      'stories': 8,
+      'lastActivity': '2 hours ago',
+      'color': Colors.blue,
+      'isHardcoded': true,
+    },
+    {
+      'id': 'hardcoded_2',
+      'name': 'Creative Stories',
+      'grade': '4th Grade',
+      'students': 15,
+      'stories': 5,
+      'lastActivity': '4 hours ago',
+      'color': Colors.green,
+      'isHardcoded': true,
+    },
+    {
+      'id': 'hardcoded_3',
+      'name': 'Adventure Tales',
+      'grade': '5th Grade',
+      'students': 18,
+      'stories': 12,
+      'lastActivity': '1 day ago',
+      'color': Colors.purple,
+      'isHardcoded': true,
+    },
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLocalClasses();
+  }
+
+  Future<void> _loadLocalClasses() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final classesJson = prefs.getString('teacher_classes') ?? '[]';
+      final List<dynamic> classesList = jsonDecode(classesJson);
+      setState(() {
+        _localClasses = classesList.cast<Map<String, dynamic>>();
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading local classes: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  List<Map<String, dynamic>> get _allClasses {
+    return [..._hardcodedClasses, ..._localClasses];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +115,9 @@ class TeacherClassesScreen extends StatelessWidget {
                     color: const Color(0xFF6B73FF).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text(
-                    '3 Classes',
-                    style: TextStyle(
+                  child: Text(
+                    _isLoading ? 'Loading...' : '${_allClasses.length} Classes',
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF6B73FF),
@@ -59,39 +130,23 @@ class TeacherClassesScreen extends StatelessWidget {
             const SizedBox(height: 24),
             
             // Class Cards
-            _buildClassCard(
-              context: context,
-              className: 'Morning Reading',
-              grade: '3rd Grade',
-              students: 12,
-              stories: 8,
-              lastActivity: '2 hours ago',
-              color: Colors.blue,
-            ),
-            
-            const SizedBox(height: 16),
-            
-            _buildClassCard(
-              context: context,
-              className: 'Creative Stories',
-              grade: '4th Grade',
-              students: 15,
-              stories: 5,
-              lastActivity: '4 hours ago',
-              color: Colors.green,
-            ),
-            
-            const SizedBox(height: 16),
-            
-            _buildClassCard(
-              context: context,
-              className: 'Adventure Tales',
-              grade: '5th Grade',
-              students: 18,
-              stories: 12,
-              lastActivity: '1 day ago',
-              color: Colors.purple,
-            ),
+            if (_isLoading)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(32.0),
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B73FF)),
+                  ),
+                ),
+              )
+            else
+              ..._allClasses.map((classData) => Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: _buildClassCard(
+                  context: context,
+                  classData: classData,
+                ),
+              )).toList(),
             
             const SizedBox(height: 32),
             
@@ -161,13 +216,20 @@ class TeacherClassesScreen extends StatelessWidget {
 
   Widget _buildClassCard({
     required BuildContext context,
-    required String className,
-    required String grade,
-    required int students,
-    required int stories,
-    required String lastActivity,
-    required Color color,
+    required Map<String, dynamic> classData,
   }) {
+    final bool isHardcoded = classData['isHardcoded'] ?? false;
+    final String className = classData['name'] ?? 'Unknown Class';
+    final String grade = classData['grade'] ?? 'Unknown Grade';
+    final int students = isHardcoded 
+        ? (classData['students'] ?? 0) 
+        : (classData['students'] as List?)?.length ?? 0;
+    final int stories = classData['stories'] ?? 0;
+    final String lastActivity = isHardcoded 
+        ? (classData['lastActivity'] ?? 'No activity') 
+        : 'Just created';
+    final Color color = classData['color'] ?? Colors.grey;
+    
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -334,13 +396,18 @@ class TeacherClassesScreen extends StatelessWidget {
     );
   }
 
-  void _showCreateClassDialog(BuildContext context) {
-    showDialog(
+  void _showCreateClassDialog(BuildContext context) async {
+    final result = await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return const CreateClassWizard();
       },
     );
+    
+    // If a class was created, refresh the list
+    if (result == 'refresh') {
+      _loadLocalClasses();
+    }
   }
 }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/gemini_service.dart';
 import 'teacher_story_detail_screen.dart';
+import 'teacher_dashboard_screen.dart';
 
 class CreateStoryScreen extends StatefulWidget {
   const CreateStoryScreen({super.key});
@@ -26,10 +28,14 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
   List<String> _selectedStudents = [];
   bool _isAllStudents = true;
   bool _isGenerating = false;
+  bool _isLoadingClasses = true;
   List<String> _selectedEmotions = [];
   
-  // Sample data - in real app this would come from API
-  final List<Map<String, dynamic>> _classes = [
+  // Dynamic classes loaded from local storage
+  List<Map<String, dynamic>> _localClasses = [];
+  
+  // Hardcoded classes to show alongside local ones
+  final List<Map<String, dynamic>> _hardcodedClasses = [
     {
       'id': 'class_1',
       'name': 'Morning Reading',
@@ -50,6 +56,10 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
     },
   ];
 
+  List<Map<String, dynamic>> get _classes {
+    return [..._hardcodedClasses, ..._localClasses];
+  }
+
   // Emotion options for selection
   final List<Map<String, dynamic>> _emotions = [
     {'name': 'Empathy', 'icon': Icons.favorite, 'color': const Color(0xFFE91E63)}, // Vibrant Pink
@@ -64,6 +74,12 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _loadClasses();
+  }
+
+  @override
   void dispose() {
     _moodController.dispose();
     _weatherController.dispose();
@@ -72,10 +88,44 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
     super.dispose();
   }
 
+  Future<void> _loadClasses() async {
+    try {
+      final classes = await _getLocalClasses();
+      setState(() {
+        _localClasses = classes;
+        _isLoadingClasses = false;
+      });
+    } catch (e) {
+      print('Error loading classes: $e');
+      setState(() {
+        _isLoadingClasses = false;
+      });
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _getLocalClasses() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final classesJson = prefs.getString('teacher_classes') ?? '[]';
+      final List<dynamic> classesList = jsonDecode(classesJson);
+      return classesList.cast<Map<String, dynamic>>();
+    } catch (e) {
+      print('Error loading classes: $e');
+      return [];
+    }
+  }
+
   List<String> get _currentStudents {
     if (_selectedClass == null) return [];
     final classData = _classes.firstWhere((c) => c['id'] == _selectedClass);
-    return List<String>.from(classData['students']);
+    
+    // For hardcoded classes, return the predefined student list
+    if (_hardcodedClasses.any((c) => c['id'] == _selectedClass)) {
+      return List<String>.from(classData['students'] ?? []);
+    }
+    
+    // For locally created classes, return empty list (they start with 0 students)
+    return [];
   }
 
   String get _selectedStudentsText {
@@ -83,6 +133,22 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
     if (_selectedStudents.isEmpty) return 'Select Students';
     if (_selectedStudents.length == 1) return _selectedStudents.first;
     return '${_selectedStudents.length} students selected';
+  }
+
+  String _getStudentSelectionText() {
+    if (_selectedClass == null) return 'Select a class first';
+    
+    if (_currentStudents.isEmpty) {
+      // Check if it's a locally created class
+      final isLocalClass = !_hardcodedClasses.any((c) => c['id'] == _selectedClass);
+      if (isLocalClass) {
+        return 'No students in this class yet';
+      } else {
+        return 'No students available';
+      }
+    }
+    
+    return _selectedStudentsText;
   }
 
   void _toggleEmotion(String emotionName) {
@@ -247,8 +313,12 @@ Written in a warm, nurturing tone that a teacher would use. Make it educational 
 
   String _getSelectedClassName() {
     if (_selectedClass == null) return '';
-    final classData = _classes.firstWhere((c) => c['id'] == _selectedClass);
-    return classData['name'];
+    try {
+      final classData = _classes.firstWhere((c) => c['id'] == _selectedClass);
+      return classData['name'] ?? 'Unknown Class';
+    } catch (e) {
+      return 'Unknown Class';
+    }
   }
 
   Future<void> _saveStoryToBackend({
@@ -406,45 +476,74 @@ Written in a warm, nurturing tone that a teacher would use. Make it educational 
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.grey[300]!),
           ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: _selectedClass,
-              hint: const Text('Choose a class'),
-              isExpanded: true,
-              items: _classes.map((classData) {
-                return DropdownMenuItem<String>(
-                  value: classData['id'],
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
+          child: _isLoadingClasses 
+              ? const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Row(
                     children: [
-                      Text(
-                        classData['name'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B73FF)),
                         ),
                       ),
-                      Text(
-                        '${classData['grade']} • ${classData['students'].length} students',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 12,
-                        ),
-                      ),
+                      SizedBox(width: 12),
+                      Text('Loading classes...'),
                     ],
                   ),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedClass = value;
-                  _selectedStudents.clear();
-                  _isAllStudents = true;
-                });
-              },
-            ),
-          ),
+                )
+              : _classes.isEmpty
+                  ? const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          Icon(Icons.info_outline, color: Colors.grey),
+                          SizedBox(width: 12),
+                          Text('No classes found. Create a class first.'),
+                        ],
+                      ),
+                    )
+                  : DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _selectedClass,
+                        hint: const Text('Choose a class'),
+                        isExpanded: true,
+                        items: _classes.map((classData) {
+                          return DropdownMenuItem<String>(
+                            value: classData['id'],
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  classData['name'],
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Text(
+                                  '${classData['grade']} • ${(classData['students'] as List?)?.length ?? 0} students',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedClass = value;
+                            _selectedStudents.clear();
+                            _isAllStudents = true;
+                          });
+                        },
+                      ),
+                    ),
         ),
       ],
     );
@@ -464,7 +563,7 @@ Written in a warm, nurturing tone that a teacher would use. Make it educational 
         ),
         const SizedBox(height: 12),
         GestureDetector(
-          onTap: _selectedClass != null ? _showStudentSelectionDialog : null,
+          onTap: _selectedClass != null && _currentStudents.isNotEmpty ? _showStudentSelectionDialog : null,
           child: Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
@@ -479,18 +578,25 @@ Written in a warm, nurturing tone that a teacher would use. Make it educational 
               children: [
                 Expanded(
                   child: Text(
-                    _selectedClass != null ? _selectedStudentsText : 'Select a class first',
+                    _getStudentSelectionText(),
                     style: TextStyle(
                       fontSize: 16,
                       color: _selectedClass != null ? const Color(0xFF2D3436) : Colors.grey[500],
                     ),
                   ),
                 ),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  size: 16,
-                  color: _selectedClass != null ? const Color(0xFF6B73FF) : Colors.grey[400],
-                ),
+                if (_selectedClass != null && _currentStudents.isNotEmpty)
+                  const Icon(
+                    Icons.arrow_forward_ios,
+                    size: 16,
+                    color: Color(0xFF6B73FF),
+                  )
+                else
+                  Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: Colors.grey[400],
+                  ),
               ],
             ),
           ),
