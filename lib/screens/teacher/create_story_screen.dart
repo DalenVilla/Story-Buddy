@@ -125,6 +125,15 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
       // Generate story using Gemini
       final storyContent = await _geminiService.generateTeacherStory(prompt);
       
+      // Generate story title using Gemini
+      String storyTitle;
+      try {
+        storyTitle = await _geminiService.generateStoryTitle(story: storyContent);
+      } catch (e) {
+        print('Error generating story title: $e');
+        storyTitle = 'Story for ${_getSelectedClassName()}'; // Fallback title
+      }
+      
       // Generate image for the story
       String? imageUrl;
       try {
@@ -141,7 +150,7 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
           MaterialPageRoute(
             builder: (context) => TeacherStoryDetailScreen(
               storyId: 'generated_${DateTime.now().millisecondsSinceEpoch}',
-              storyName: 'Story for ${_getSelectedClassName()}',
+              storyName: storyTitle,
               storyContent: storyContent,
               imageUrl: imageUrl ?? 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=300&fit=crop',
             ),
@@ -196,7 +205,7 @@ Please create a story that:
  Shows healthy ways to understand and cope with the focus emotions
 
 
-Use easy words (suitable for 6-year-olds) and short sentences
+Use easy words (suitable for 6-year-olds) and short sentences AND 4 paragraphs only
 
 Gently explore why someone might feel: $focusEmotions
 
