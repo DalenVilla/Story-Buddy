@@ -18,7 +18,6 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
   final _weatherController = TextEditingController();
   final _eventController = TextEditingController();
   final _changeController = TextEditingController();
-  final _themesController = TextEditingController();
   
   // Selection states
   String? _selectedClass;
@@ -68,7 +67,6 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
     _weatherController.dispose();
     _eventController.dispose();
     _changeController.dispose();
-    _themesController.dispose();
     super.dispose();
   }
 
@@ -188,18 +186,16 @@ Context:
 - If their mood was weather: ${_weatherController.text}
 - Notable event today: ${_eventController.text}
 - What they might want to change: ${_changeController.text}
-- Magical/imaginative themes: ${_themesController.text}
 
 Please create a story that:
 1. Specifically addresses the selected emotions: $focusEmotions
 2. Includes relatable characters that students can connect with
 3. Incorporates the weather/mood metaphor naturally
 4. Provides gentle guidance or reflection on the day's events
-5. Includes the requested magical or imaginative elements
-6. Has a positive, uplifting message
-7. Is age-appropriate and engaging
-8. Helps students process their feelings and experiences
-9. Shows healthy ways to understand and cope with the focus emotions
+5. Has a positive, uplifting message
+6. Is age-appropriate and engaging
+7. Helps students process their feelings and experiences
+8. Shows healthy ways to understand and cope with the focus emotions
 
 The story should be 200-300 words, written in a warm, nurturing tone that a teacher would use. Make it educational yet entertaining, with clear emotional lessons woven throughout, especially focusing on the emotions: $focusEmotions.
 ''';
@@ -647,14 +643,6 @@ The story should be 200-300 words, written in a warm, nurturing tone that a teac
           controller: _changeController,
           label: 'If they could change one thing about today, what would it be?',
           hint: 'e.g., more confidence, better focus, kindness...',
-        ),
-        
-        const SizedBox(height: 16),
-        
-        _buildTextInput(
-          controller: _themesController,
-          label: 'Any magical or imaginative themes you\'d like included?',
-          hint: 'e.g., dragons, space adventure, underwater world...',
         ),
       ],
     );
