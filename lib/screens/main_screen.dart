@@ -22,7 +22,7 @@ class MainScreen extends StatelessWidget {
         ),
         child: SafeArea(
           child: Stack(
-            children: [
+              children: [
               // Floating decorative elements
               Positioned(
                 top: 80,
@@ -127,29 +127,29 @@ class MainScreen extends StatelessWidget {
                       ),
                     ),
                     
-                    const SizedBox(height: 16),
+                const SizedBox(height: 16),
                     
                     // Enhanced subtitle
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Text(
-                        'Interactive storytelling for children!',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white.withOpacity(0.9),
+                  'Interactive storytelling for children!',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white.withOpacity(0.9),
                           fontWeight: FontWeight.w400,
                           letterSpacing: 0.5,
                           height: 1.4,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
                     ),
                     
-                    const Spacer(flex: 3),
+                const Spacer(flex: 3),
                     
                     // Enhanced Get Started Button
                     Container(
-                      width: double.infinity,
+                  width: double.infinity,
                       height: 60,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
@@ -161,30 +161,30 @@ class MainScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SignUpMainScreen(),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFF6B73FF),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          elevation: 0,
-                          shadowColor: Colors.transparent,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SignUpMainScreen(),
                         ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFF6B73FF),
+                      shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                      ),
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                    ),
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Get Started',
-                              style: TextStyle(
+                      'Get Started',
+                      style: TextStyle(
                                 fontSize: 19,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.5,
@@ -220,36 +220,36 @@ class MainScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: OutlinedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const LoginScreen(),
-                            ),
-                          );
-                        },
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
                           side: BorderSide.none,
-                          shape: RoundedRectangleBorder(
+                      shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        child: const Text(
-                          'I Already Have an Account',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
                       ),
                     ),
-                    
-                    const Spacer(flex: 2),
-                  ],
+                    child: const Text(
+                      'I Already Have an Account',
+                      style: TextStyle(
+                            fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                            letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
                 ),
+                    
+                const Spacer(flex: 2),
+              ],
+            ),
               ),
             ],
           ),

@@ -229,9 +229,15 @@ class _TeacherClassesScreenState extends State<TeacherClassesScreen> {
     final bool isHardcoded = classData['isHardcoded'] ?? false;
     final String className = classData['name'] ?? 'Unknown Class';
     final String grade = classData['grade'] ?? 'Unknown Grade';
-    final int students = isHardcoded 
-        ? (classData['students'] ?? 0) 
-        : (classData['students'] as List?)?.length ?? 0;
+    // Safely determine student count to avoid type errors
+    int students = 0;
+    if (classData.containsKey('studentsList') && classData['studentsList'] is List) {
+      students = (classData['studentsList'] as List).length;
+    } else if (classData['students'] is int) {
+      students = classData['students'] as int;
+    } else if (classData['students'] is List) {
+      students = (classData['students'] as List).length;
+    }
     final int stories = classData['stories'] ?? 0;
     final String lastActivity = isHardcoded 
         ? (classData['lastActivity'] ?? 'No activity') 

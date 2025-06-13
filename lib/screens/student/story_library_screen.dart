@@ -340,43 +340,43 @@ class _StoryLibraryScreenState extends State<StoryLibraryScreen> {
         );
       },
       child: Container(
-        width: 160,
-        decoration: BoxDecoration(
+      width: 160,
+      decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFF6B73FF), Color(0xFF9B59B6)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 15,
-              offset: const Offset(0, 8),
-            ),
-            BoxShadow(
-              color: Colors.white.withOpacity(0.8),
-              blurRadius: 8,
-              offset: const Offset(-2, -2),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: Colors.white.withOpacity(0.8),
+            blurRadius: 8,
+            offset: const Offset(-2, -2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
               // Story illustration/image
-              Expanded(
-                flex: 4,
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+            Expanded(
+              flex: 4,
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
                     child: story.imageUrl != null
                         ? Image.network(
                             story.imageUrl!,
@@ -417,23 +417,23 @@ class _StoryLibraryScreenState extends State<StoryLibraryScreen> {
                             ),
                           ),
                   ),
-                ),
               ),
-              
-              const SizedBox(height: 12),
-              
-              // Title
-              Text(
+            ),
+            
+            const SizedBox(height: 12),
+            
+            // Title
+            Text(
                 story.title,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
                   color: Colors.white,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
-            ],
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
           ),
         ),
       ),

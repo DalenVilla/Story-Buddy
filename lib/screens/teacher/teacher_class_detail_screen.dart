@@ -35,9 +35,19 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
   // Helper getters for class data
   String get className => widget.classData['name'] ?? 'Unknown Class';
   String get grade => widget.classData['grade'] ?? 'Unknown Grade';
-  int get studentCount => widget.classData['isHardcoded'] == true 
-      ? (widget.classData['students'] ?? 0) 
-      : (widget.classData['students'] as List?)?.length ?? 0;
+  int get studentCount {
+    // Safely determine student count regardless of underlying data type
+    if (widget.classData.containsKey('studentsList') && widget.classData['studentsList'] is List) {
+      return (widget.classData['studentsList'] as List).length;
+    }
+    if (widget.classData['students'] is int) {
+      return widget.classData['students'] as int;
+    }
+    if (widget.classData['students'] is List) {
+      return (widget.classData['students'] as List).length;
+    }
+    return 0;
+  }
   List<String> get studentsList => widget.classData['isHardcoded'] == true
       ? List<String>.from(widget.classData['studentsList'] ?? [])
       : List<String>.from(widget.classData['students'] ?? []);

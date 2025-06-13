@@ -521,12 +521,25 @@ Written in a warm, nurturing tone that a teacher would use. Make it educational 
                                     fontSize: 16,
                                   ),
                                 ),
-                                Text(
-                                  '${classData['grade']} • ${(classData['students'] as List?)?.length ?? 0} students',
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 12,
-                                  ),
+                                // Compute student count safely to avoid type errors
+                                Builder(
+                                  builder: (context) {
+                                    int studentCount = 0;
+                                    if (classData.containsKey('studentsList') && classData['studentsList'] is List) {
+                                      studentCount = (classData['studentsList'] as List).length;
+                                    } else if (classData['students'] is int) {
+                                      studentCount = classData['students'] as int;
+                                    } else if (classData['students'] is List) {
+                                      studentCount = (classData['students'] as List).length;
+                                    }
+                                    return Text(
+                                      '${classData['grade']} • $studentCount students',
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 12,
+                                      ),
+                                    );
+                                  },
                                 ),
                               ],
                             ),

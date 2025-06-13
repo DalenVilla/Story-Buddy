@@ -47,7 +47,7 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
     
     // Only generate new image and save if this is a new story
     if (widget.existingStory == null) {
-      _generateStoryImage();
+    _generateStoryImage();
     } else {
       // This is an existing story, use the stored image
       setState(() {
@@ -553,10 +553,10 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
               child: Text(
                 widget.existingStory != null ? widget.existingStory!.title : 'Your Story',
                 style: const TextStyle(
-                  color: Color(0xFF2D3436),
-                  fontWeight: FontWeight.w700,
-                  fontSize: 24,
-                ),
+            color: Color(0xFF2D3436),
+            fontWeight: FontWeight.w700,
+            fontSize: 24,
+          ),
               ),
             ),
             if (_isGeneratingTitle) ...[
@@ -983,19 +983,19 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
           ),
           // Only show Try Again for new stories, not existing ones
           if (widget.existingStory == null) ...[
-            const SizedBox(height: 16),
-            TextButton.icon(
-              onPressed: _generateStoryImage,
-              icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: const Text(
-                'Try Again',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF6B73FF),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              ),
+          const SizedBox(height: 16),
+          TextButton.icon(
+            onPressed: _generateStoryImage,
+            icon: const Icon(Icons.refresh_rounded, size: 18),
+            label: const Text(
+              'Try Again',
+              style: TextStyle(fontWeight: FontWeight.w600),
             ),
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFF6B73FF),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            ),
+          ),
           ],
         ],
       ),
