@@ -8,7 +8,7 @@ class StorytimeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const StorytimeAppBar({
     super.key,
     this.studentName = 'Ava',
-    this.teacherName = 'Ms. Johnson',
+    this.teacherName = 'Mr. Villa',
     this.grade = '3rd Grade',
   });
 

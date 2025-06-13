@@ -42,6 +42,7 @@ dependencies:
 
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
   flutter_test:
     sdk: flutter
 
@@ -54,6 +55,14 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
+
+
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "lib/assets/icon/app_icon.png"
 
 # The following section is specific to Flutter packages.
 flutter:
@@ -68,6 +77,8 @@ flutter:
     - lib/assets/solar_loading_state.webm
     - lib/assets/floating_monkey.gif
     - lib/assets/hang_monkey.gif
+    - lib/assets/app_icon_black.png
+    - lib/assets/app_icon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

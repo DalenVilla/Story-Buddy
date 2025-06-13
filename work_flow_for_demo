@@ -1,0 +1,24 @@
+student signs up
+  -> updates value in backend
+  <-
+when teacher goes to classes section
+  -> fetch from backend to check if value is set to True
+  <-
+if true it will change the made class data to have me as student with my info
+(name, etc..)
+
+when teacher goes back to check on my account
+1.) click created class with updated info
+2.) clicks on my name
+3.) show stats and the story i generated
+  - fetch with backend, (upload when student generates story)
+
+---
+
+Teacher -> Login -> show around (Data, classrooms, etc) -> Make a class 
+-> generate story and assign it to the created class
+-> FINISHED
+
+Student -> signs up using code from class -> shows around
+-> Then create your own story (showcase mic option, easy questions) -> Finish it -> go to stories page -> show the story that teacher made
+-> show them adventure story creation 
