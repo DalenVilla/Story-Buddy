@@ -124,7 +124,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Ms. Johnson's $grade",
+                      "Mr. Villa's $grade",
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -551,10 +551,6 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                             ),
                           ],
                         ),
-                      ),
-                      _buildProgressIndicator(
-                        student['progress'] as int,
-                        student['maxProgress'] as int,
                       ),
                     ],
                   ),

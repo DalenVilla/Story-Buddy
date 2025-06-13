@@ -55,26 +55,7 @@ class _TeacherClassesScreenState extends State<TeacherClassesScreen> {
       'currentStreak': 4,
       'totalReadingHours': 18.2,
     },
-    {
-      'id': 'hardcoded_3',
-      'name': 'Adventure Tales',
-      'grade': '5th Grade',
-      'studentsList': ['Zoe M.', 'Ethan B.', 'Ava H.', 'Mason R.', 'Chloe F.', 'Noah G.', 'Lily K.', 'Jackson T.', 'Maya S.', 'Oliver L.', 'Grace W.', 'Benjamin M.', 'Emma D.', 'Samuel P.', 'Isabella R.', 'Lucas A.', 'Charlotte J.', 'Henry C.'],
-      'students': 18,
-      'stories': 12,
-      'storiesRead': 63,
-      'engagementRate': 94,
-      'averageReadingTime': '15 min',
-      'popularEmotion': 'Courage',
-      'weeklyProgress': 22,
-      'lastActivity': '1 day ago',
-      'color': Colors.purple,
-      'isHardcoded': true,
-      'achievements': ['Adventure Seeker', 'Reading Master', 'Story Collector'],
-      'currentStreak': 12,
-      'totalReadingHours': 31.8,
-    },
-  ];
+   ];
 
   @override
   void initState() {

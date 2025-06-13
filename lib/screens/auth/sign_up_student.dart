@@ -49,7 +49,7 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
           builder: (context) => StudentOnboardingScreen(
             studentName: fullName,
             className: 'Morning Reading', // This would come from the class code lookup
-            teacherName: 'Ms. Johnson',
+            teacherName: 'Mr. Villa',
             grade: '3rd Grade',
             classCode: _classCodeController.text.trim(),
           ),

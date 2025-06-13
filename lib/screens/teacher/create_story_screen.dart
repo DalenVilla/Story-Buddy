@@ -50,13 +50,7 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
       'studentsList': ['Alex T.', 'Maya L.', 'James W.', 'Isabella C.', 'Lucas D.', 'Zoe R.', 'Mason K.', 'Lily P.', 'Oliver S.', 'Grace M.', 'Benjamin F.', 'Chloe A.', 'Henry J.', 'Emma B.', 'Samuel G.'],
       'students': 15,
     },
-    {
-      'id': 'hardcoded_3',
-      'name': 'Adventure Tales',
-      'grade': '5th Grade',
-      'studentsList': ['Zoe M.', 'Ethan B.', 'Ava H.', 'Mason R.', 'Chloe F.', 'Noah G.', 'Lily K.', 'Jackson T.', 'Maya S.', 'Oliver L.', 'Grace W.', 'Benjamin M.', 'Emma D.', 'Samuel P.', 'Isabella R.', 'Lucas A.', 'Charlotte J.', 'Henry C.'],
-      'students': 18,
-    },
+
   ];
 
   List<Map<String, dynamic>> get _classes {
