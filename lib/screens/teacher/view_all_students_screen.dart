@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 class ViewAllStudentsScreen extends StatelessWidget {
   final String className;
   final String grade;
-  final String subject;
   
   const ViewAllStudentsScreen({
     super.key,
     required this.className,
     required this.grade,
-    required this.subject,
   });
 
   @override
@@ -176,7 +174,7 @@ class ViewAllStudentsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${students.length} students • $grade • $subject',
+                    '${students.length} students • $grade',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white.withOpacity(0.9),

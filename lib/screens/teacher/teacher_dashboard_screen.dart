@@ -414,7 +414,6 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
   final _formKey = GlobalKey<FormState>();
   final _classNameController = TextEditingController();
   String _selectedGrade = 'Kindergarten';
-  String _selectedSubject = 'English';
   
   // Step 2 - Emotions
   List<String> _selectedEmotions = [];
@@ -432,16 +431,7 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
     '6th Grade'
   ];
 
-  final List<String> _subjects = [
-    'English',
-    'Math',
-    'Science',
-    'Social Studies',
-    'Art',
-    'Music',
-    'Physical Education',
-    'Other'
-  ];
+
 
   final List<Map<String, dynamic>> _allEmotions = [
     {'name': 'Empathy', 'icon': Icons.favorite, 'color': Colors.pink},

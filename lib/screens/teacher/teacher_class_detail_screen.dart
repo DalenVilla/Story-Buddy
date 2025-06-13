@@ -5,14 +5,12 @@ import 'view_all_students_screen.dart';
 class TeacherClassDetailScreen extends StatefulWidget {
   final String className;
   final String grade;
-  final String subject;
   final int students;
 
   const TeacherClassDetailScreen({
     super.key,
     required this.className,
     required this.grade,
-    required this.subject,
     required this.students,
   });
 
@@ -118,7 +116,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '${widget.grade} • ${widget.students} students • ${widget.subject}',
+                      '${widget.grade} • ${widget.students} students',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.grey[600],
@@ -442,7 +440,6 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                     builder: (context) => ViewAllStudentsScreen(
                       className: widget.className,
                       grade: widget.grade,
-                      subject: widget.subject,
                     ),
                   ),
                 );

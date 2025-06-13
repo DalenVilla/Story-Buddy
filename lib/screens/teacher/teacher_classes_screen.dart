@@ -63,7 +63,6 @@ class TeacherClassesScreen extends StatelessWidget {
               context: context,
               className: 'Morning Reading',
               grade: '3rd Grade',
-              subject: 'English',
               students: 12,
               stories: 8,
               lastActivity: '2 hours ago',
@@ -74,9 +73,8 @@ class TeacherClassesScreen extends StatelessWidget {
             
             _buildClassCard(
               context: context,
-              className: 'Math Adventures',
+              className: 'Creative Stories',
               grade: '4th Grade',
-              subject: 'Math',
               students: 15,
               stories: 5,
               lastActivity: '4 hours ago',
@@ -87,9 +85,8 @@ class TeacherClassesScreen extends StatelessWidget {
             
             _buildClassCard(
               context: context,
-              className: 'Science Explorers',
+              className: 'Adventure Tales',
               grade: '5th Grade',
-              subject: 'Science',
               students: 18,
               stories: 12,
               lastActivity: '1 day ago',
@@ -166,7 +163,6 @@ class TeacherClassesScreen extends StatelessWidget {
     required BuildContext context,
     required String className,
     required String grade,
-    required String subject,
     required int students,
     required int stories,
     required String lastActivity,
@@ -180,7 +176,6 @@ class TeacherClassesScreen extends StatelessWidget {
             builder: (context) => TeacherClassDetailScreen(
               className: className,
               grade: grade,
-              subject: subject,
               students: students,
             ),
           ),
@@ -232,7 +227,7 @@ class TeacherClassesScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '$grade • $subject',
+                        grade,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[600],
