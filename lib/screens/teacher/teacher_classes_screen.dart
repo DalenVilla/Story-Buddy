@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'teacher_class_detail_screen.dart';
 import 'teacher_dashboard_screen.dart';
+import 'dart:async';
 
 class TeacherClassesScreen extends StatefulWidget {
   const TeacherClassesScreen({super.key});
@@ -14,6 +15,8 @@ class TeacherClassesScreen extends StatefulWidget {
 class _TeacherClassesScreenState extends State<TeacherClassesScreen> {
   List<Map<String, dynamic>> _localClasses = [];
   bool _isLoading = true;
+
+  Timer? _refreshTimer;
 
   // Hardcoded classes to show alongside local ones
   final List<Map<String, dynamic>> _hardcodedClasses = [
@@ -61,6 +64,17 @@ class _TeacherClassesScreenState extends State<TeacherClassesScreen> {
   void initState() {
     super.initState();
     _loadLocalClasses();
+
+    // Set up periodic refresh to capture delayed student additions
+    _refreshTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      _loadLocalClasses();
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadLocalClasses() async {

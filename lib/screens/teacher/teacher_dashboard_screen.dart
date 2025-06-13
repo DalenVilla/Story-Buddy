@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'teacher_classes_screen.dart';
+import 'dart:async';
 
 class TeacherDashboardScreen extends StatelessWidget {
   final VoidCallback? onNavigateToClasses;
@@ -125,7 +126,7 @@ class TeacherDashboardScreen extends StatelessWidget {
                     },
                     child: _buildStatCard(
                       'Active Classes',
-                      '3',
+                      '2',
                       Icons.class_outlined,
                       Colors.blue,
                     ),
@@ -433,8 +434,6 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
     '6th Grade'
   ];
 
-
-
   final List<Map<String, dynamic>> _allEmotions = [
     {'name': 'Empathy', 'icon': Icons.favorite, 'color': Colors.pink},
     {'name': 'Resilience', 'icon': Icons.shield, 'color': Colors.blue},
@@ -496,15 +495,7 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
   }
 
   String _generateClassCode() {
-
     return "QWERPA";
-    // Generate a simple 6-character class code
-    // const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    // return String.fromCharCodes(
-    //   Iterable.generate(6, (index) => chars.codeUnitAt(
-    //     (DateTime.now().millisecondsSinceEpoch + index) % chars.length
-    //   ))
-    // );
   }
 
   Future<void> _saveClassToLocal() async {
@@ -544,7 +535,41 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
       // Save back to preferences
       await prefs.setString('teacher_classes', jsonEncode(existingClasses));
       
+      final String newClassId = classData['id'] as String;
       print('Class saved locally: ${classData['name']}');
+
+      // Schedule automatic addition of "Hairth Hayyawi" after 10 seconds
+      Future.delayed(const Duration(seconds: 10), () async {
+        try {
+          final prefsDelayed = await SharedPreferences.getInstance();
+          final delayedJson = prefsDelayed.getString('teacher_classes') ?? '[]';
+          final List<dynamic> delayedList = jsonDecode(delayedJson);
+
+          final int index = delayedList.indexWhere((c) => c['id'] == newClassId);
+          if (index != -1) {
+            final Map<String, dynamic> targetClass = Map<String, dynamic>.from(delayedList[index]);
+            // Ensure students field is a list
+            List<dynamic> studentsField;
+            if (targetClass['students'] is List) {
+              studentsField = List<dynamic>.from(targetClass['students']);
+            } else if (targetClass['students'] is int) {
+              studentsField = [];
+            } else {
+              studentsField = [];
+            }
+            if (!studentsField.contains('Hairth Hayyawi')) {
+              studentsField.add('Hairth Hayyawi');
+            }
+            targetClass['students'] = studentsField;
+
+            delayedList[index] = targetClass;
+            await prefsDelayed.setString('teacher_classes', jsonEncode(delayedList));
+            print('"Hairth Hayyawi" automatically added to class ${targetClass['name']}');
+          }
+        } catch (e) {
+          print('Error adding automatic student: $e');
+        }
+      });
     } catch (e) {
       print('Error saving class: $e');
     }
@@ -791,7 +816,6 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
           
           const SizedBox(height: 20),
           
-
         ],
       ),
     );

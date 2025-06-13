@@ -396,7 +396,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
     
     // For hardcoded classes, create sample data
     List<Map<String, dynamic>> allStudents = [];
-    if (widget.classData['isHardcoded'] == true && students.isNotEmpty) {
+    if (students.isNotEmpty) {
       final sampleStories = [
         'The Brave Little Fox',
         'Magic Garden Adventure', 

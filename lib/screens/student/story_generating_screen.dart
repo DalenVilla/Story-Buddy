@@ -37,7 +37,7 @@ class _StoryGeneratingScreenState extends State<StoryGeneratingScreen> with Sing
   Future<void> _generateStory() async {
     try {
       setState(() {
-        _statusText = 'Connecting to AI...';
+        _statusText = 'Generating your story...';
       });
 
       // You can customize these parameters based on your app's needs

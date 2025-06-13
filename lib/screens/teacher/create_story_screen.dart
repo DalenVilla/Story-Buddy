@@ -121,8 +121,8 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
       return List<String>.from(classData['studentsList'] ?? []);
     }
     
-    // For locally created classes, return empty list (they start with 0 students)
-    return [];
+    // For locally created classes, return its students list (may be empty)
+    return List<String>.from(classData['students'] ?? []);
   }
 
   String get _selectedStudentsText {
