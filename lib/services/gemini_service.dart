@@ -303,6 +303,68 @@ Return ONLY the title, nothing else.
     }
   }
 
+  Future<String> generateTeacherStory(String prompt) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl?key=$_apiKey'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'contents': [{
+            'parts': [{
+              'text': prompt
+            }]
+          }],
+          'generationConfig': {
+            'temperature': 0.8,
+            'topK': 40,
+            'topP': 0.9,
+            'maxOutputTokens': 1024,
+            'candidateCount': 1,
+          },
+          'safetySettings': [
+            {
+              'category': 'HARM_CATEGORY_HARASSMENT',
+              'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              'category': 'HARM_CATEGORY_HATE_SPEECH',
+              'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              'category': 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+              'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              'category': 'HARM_CATEGORY_DANGEROUS_CONTENT',
+              'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+            }
+          ]
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        
+        if (data['candidates'] != null && 
+            data['candidates'].isNotEmpty &&
+            data['candidates'][0]['content'] != null &&
+            data['candidates'][0]['content']['parts'] != null &&
+            data['candidates'][0]['content']['parts'].isNotEmpty) {
+          
+          return data['candidates'][0]['content']['parts'][0]['text'];
+        } else {
+          throw Exception('No story content received from Gemini API');
+        }
+      } else {
+        throw Exception('Failed to generate teacher story: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error generating teacher story: $e');
+    }
+  }
+
   Future<Map<String, dynamic>> generateAdventurePart({
     required List<String> storySoFar,
     String? lastChoice,

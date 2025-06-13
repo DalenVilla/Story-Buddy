@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'teacher_story_detail_screen.dart';
+import 'create_story_screen.dart';
 
 class TeacherStoriesScreen extends StatefulWidget {
   const TeacherStoriesScreen({super.key});
@@ -485,11 +486,10 @@ class _TeacherStoriesScreenState extends State<TeacherStoriesScreen> {
   Widget _buildCreateStoryButton() {
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Create story functionality coming soon!'),
-            backgroundColor: Color(0xFF6B73FF),
-            behavior: SnackBarBehavior.floating,
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const CreateStoryScreen(),
           ),
         );
       },
