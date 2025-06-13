@@ -179,8 +179,7 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
 Create a thoughtful, educational story for a teacher to share with their students. 
 
 Context:
-- Class: $className
-- Target audience: $studentInfo
+- Target audience: 6 year old
 - Primary emotions to focus on: $focusEmotions
 - Student mood today: ${_moodController.text}
 - If their mood was weather: ${_weatherController.text}
@@ -188,16 +187,33 @@ Context:
 - What they might want to change: ${_changeController.text}
 
 Please create a story that:
-1. Specifically addresses the selected emotions: $focusEmotions
-2. Includes relatable characters that students can connect with
-3. Incorporates the weather/mood metaphor naturally
-4. Provides gentle guidance or reflection on the day's events
-5. Has a positive, uplifting message
-6. Is age-appropriate and engaging
-7. Helps students process their feelings and experiences
-8. Shows healthy ways to understand and cope with the focus emotions
+ Includes relatable characters that students can connect with
+ Incorporates the weather/mood metaphor naturally
+ Provides gentle guidance or reflection on the day's events
+ Has a positive, uplifting message
+ Is age-appropriate and engaging
+ Helps students process their feelings and experiences
+ Shows healthy ways to understand and cope with the focus emotions
 
-The story should be 200-300 words, written in a warm, nurturing tone that a teacher would use. Make it educational yet entertaining, with clear emotional lessons woven throughout, especially focusing on the emotions: $focusEmotions.
+
+Use easy words (suitable for 6-year-olds) and short sentences
+
+Gently explore why someone might feel: $focusEmotions
+
+Include a simple event similar to: ${_eventController.text}
+
+Show the weather as a metaphor for feelings
+
+Introduce a friendly character who feels the same way
+
+Help the character understand or fix the feeling/problem
+
+End with a kind and hopeful message
+
+Avoid narrator text like "Here's your story" — just begin the story
+
+
+Written in a warm, nurturing tone that a teacher would use. Make it educational yet entertaining, with clear emotional lessons woven throughout, especially focusing on the emotions: $focusEmotions.
 ''';
   }
 
