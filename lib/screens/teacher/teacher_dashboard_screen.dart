@@ -721,11 +721,117 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
   Widget _buildBasicInfoStep() {
     return Form(
       key: _formKey,
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Class Information',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2D3436),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Enter the basic details for your new class',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 32),
+            
+            TextFormField(
+              controller: _classNameController,
+              decoration: InputDecoration(
+                labelText: 'Class Name',
+                hintText: 'e.g., Morning Reading',
+                labelStyle: TextStyle(
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey[300]!),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: Color(0xFF6B73FF),
+                    width: 2,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Please enter a class name';
+                }
+                return null;
+              },
+            ),
+            
+            const SizedBox(height: 20),
+            
+            DropdownButtonFormField<String>(
+              value: _selectedGrade,
+              decoration: InputDecoration(
+                labelText: 'Grade Level',
+                labelStyle: TextStyle(
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey[300]!),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: Color(0xFF6B73FF),
+                    width: 2,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+              ),
+              items: _grades.map((String grade) {
+                return DropdownMenuItem<String>(
+                  value: grade,
+                  child: Text(grade),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedGrade = newValue!;
+                });
+              },
+            ),
+            
+            const SizedBox(height: 20),
+            
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmotionsStep() {
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Class Information',
+            'Emotional Focus',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -734,7 +840,7 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Enter the basic details for your new class',
+            'Select 1-3 emotional themes for your class (${_selectedEmotions.length}/3 selected)',
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey[600],
@@ -742,196 +848,92 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
           ),
           const SizedBox(height: 32),
           
-          TextFormField(
-            controller: _classNameController,
-            decoration: InputDecoration(
-              labelText: 'Class Name',
-              hintText: 'e.g., Morning Reading',
-              labelStyle: TextStyle(
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w500,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.grey[300]!),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(
-                  color: Color(0xFF6B73FF),
-                  width: 2,
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: _allEmotions.map((emotion) {
+              final emotionName = emotion['name'] as String;
+              final isSelected = _selectedEmotions.contains(emotionName);
+              final canSelect = _selectedEmotions.length < 3 || isSelected;
+
+              return GestureDetector(
+                onTap: canSelect ? () {
+                  setState(() {
+                    if (isSelected) {
+                      _selectedEmotions.remove(emotionName);
+                    } else {
+                      if (_selectedEmotions.length < 3) {
+                        _selectedEmotions.add(emotionName);
+                      }
+                    }
+                  });
+                } : null,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? (emotion['color'] as Color).withOpacity(0.2)
+                        : Colors.grey[50],
+                    border: Border.all(
+                      color: isSelected
+                          ? emotion['color'] as Color
+                          : canSelect
+                              ? Colors.grey[300]!
+                              : Colors.grey[200]!,
+                      width: isSelected ? 2 : 1,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        emotion['icon'] as IconData,
+                        color: isSelected || canSelect
+                            ? emotion['color'] as Color
+                            : Colors.grey[400],
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        emotionName,
+                        style: TextStyle(
+                          color: isSelected
+                              ? emotion['color'] as Color
+                              : canSelect
+                                  ? const Color(0xFF2D3436)
+                                  : Colors.grey[400],
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                        ),
+                      ),
+                      if (isSelected) ...[
+                        const SizedBox(width: 8),
+                        Icon(
+                          Icons.check_circle,
+                          color: emotion['color'] as Color,
+                          size: 18,
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 16,
-              ),
-            ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Please enter a class name';
-              }
-              return null;
-            },
-          ),
-          
-          const SizedBox(height: 20),
-          
-          DropdownButtonFormField<String>(
-            value: _selectedGrade,
-            decoration: InputDecoration(
-              labelText: 'Grade Level',
-              labelStyle: TextStyle(
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w500,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.grey[300]!),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(
-                  color: Color(0xFF6B73FF),
-                  width: 2,
-                ),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 16,
-              ),
-            ),
-            items: _grades.map((String grade) {
-              return DropdownMenuItem<String>(
-                value: grade,
-                child: Text(grade),
               );
             }).toList(),
-            onChanged: (String? newValue) {
-              setState(() {
-                _selectedGrade = newValue!;
-              });
-            },
           ),
           
-          const SizedBox(height: 20),
-          
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmotionsStep() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Emotional Focus',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF2D3436),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Select 1-3 emotional themes for your class (${_selectedEmotions.length}/3 selected)',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey[600],
-          ),
-        ),
-        const SizedBox(height: 32),
-        
-        Expanded(
-          child: SingleChildScrollView(
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: _allEmotions.map((emotion) {
-                final emotionName = emotion['name'] as String;
-                final isSelected = _selectedEmotions.contains(emotionName);
-                final canSelect = _selectedEmotions.length < 3 || isSelected;
-
-                return GestureDetector(
-                  onTap: canSelect ? () {
-                    setState(() {
-                      if (isSelected) {
-                        _selectedEmotions.remove(emotionName);
-                      } else {
-                        if (_selectedEmotions.length < 3) {
-                          _selectedEmotions.add(emotionName);
-                        }
-                      }
-                    });
-                  } : null,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? (emotion['color'] as Color).withOpacity(0.2)
-                          : Colors.grey[50],
-                      border: Border.all(
-                        color: isSelected
-                            ? emotion['color'] as Color
-                            : canSelect
-                                ? Colors.grey[300]!
-                                : Colors.grey[200]!,
-                        width: isSelected ? 2 : 1,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          emotion['icon'] as IconData,
-                          color: isSelected || canSelect
-                              ? emotion['color'] as Color
-                              : Colors.grey[400],
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          emotionName,
-                          style: TextStyle(
-                            color: isSelected
-                                ? emotion['color'] as Color
-                                : canSelect
-                                    ? const Color(0xFF2D3436)
-                                    : Colors.grey[400],
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                          ),
-                        ),
-                        if (isSelected) ...[
-                          const SizedBox(width: 8),
-                          Icon(
-                            Icons.check_circle,
-                            color: emotion['color'] as Color,
-                            size: 18,
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-        ),
-        
-        if (_selectedEmotions.isEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Text(
-              'Please select at least one emotional theme',
-              style: TextStyle(
-                color: Colors.red[600],
-                fontSize: 14,
+          if (_selectedEmotions.isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: Text(
+                'Please select at least one emotional theme',
+                style: TextStyle(
+                  color: Colors.red[600],
+                  fontSize: 14,
+                ),
               ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 
