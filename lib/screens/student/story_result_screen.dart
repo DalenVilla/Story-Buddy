@@ -37,7 +37,7 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
   List<Map<String, dynamic>> _storySegments = [];
   int _currentWordIndex = -1;
   String _cleanedStoryForDisplay = "";
-  int _highlightUpdateCounter = 0;
+  DateTime _lastUpdateTime = DateTime.now();
 
   @override
   void initState() {
@@ -122,20 +122,23 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
   }
 
   void _simulateWordProgress() async {
-    // Calculate approximate timing based on speech rate and word count
-    double wordsPerSecond = 2.0; // Slower to reduce glitching
+    // Much slower and more stable timing
+    double wordsPerSecond = 1.5; // Even slower for stability
     int totalWords = _storySegments.where((seg) => seg['type'] == 'word').length;
     double intervalMs = (1000 / wordsPerSecond);
     
     for (int i = 0; i < totalWords && _isSpeaking; i++) {
       await Future.delayed(Duration(milliseconds: intervalMs.round()));
       if (_isSpeaking && mounted) {
-        // Throttle updates to reduce glitching
-        _highlightUpdateCounter++;
-        if (_highlightUpdateCounter % 2 == 0) { // Update every other cycle
+        // Only update if the word index actually changed and enough time has passed
+        DateTime now = DateTime.now();
+        if (_currentWordIndex != i && now.difference(_lastUpdateTime).inMilliseconds > 100) {
+          _lastUpdateTime = now;
           setState(() {
             _currentWordIndex = i;
           });
+          // Add a small delay after state update to prevent rapid changes
+          await Future.delayed(const Duration(milliseconds: 100));
         }
       }
     }
@@ -167,34 +170,42 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
       );
     }
 
-    return RichText(
-      text: TextSpan(
-        style: const TextStyle(
-          fontSize: 17,
-          height: 1.7,
-          color: Color(0xFF2D3436),
-          fontWeight: FontWeight.w400,
-          letterSpacing: 0.2,
+    // Cache the text spans to avoid rebuilding on every frame
+    List<TextSpan> textSpans = [];
+    
+    for (var segment in _storySegments) {
+      if (segment['type'] == 'paragraph_break') {
+        textSpans.add(const TextSpan(text: '\n\n'));
+      } else if (segment['type'] == 'space') {
+        textSpans.add(const TextSpan(text: ' '));
+      } else if (segment['type'] == 'word') {
+        bool isCurrentWord = segment['wordIndex'] == _currentWordIndex;
+        
+        textSpans.add(TextSpan(
+          text: segment['content'],
+          style: TextStyle(
+            fontWeight: isCurrentWord ? FontWeight.w700 : FontWeight.w400,
+            backgroundColor: isCurrentWord 
+                ? Colors.orange.withOpacity(0.15) 
+                : Colors.transparent,
+            color: const Color(0xFF2D3436),
+          ),
+        ));
+      }
+    }
+
+    return RepaintBoundary(
+      child: RichText(
+        text: TextSpan(
+          style: const TextStyle(
+            fontSize: 17,
+            height: 1.7,
+            color: Color(0xFF2D3436),
+            fontWeight: FontWeight.w400,
+            letterSpacing: 0.2,
+          ),
+          children: textSpans,
         ),
-        children: _storySegments.map((segment) {
-          if (segment['type'] == 'paragraph_break') {
-            return const TextSpan(text: '\n\n');
-          } else if (segment['type'] == 'space') {
-            return const TextSpan(text: ' ');
-          } else if (segment['type'] == 'word') {
-            bool isCurrentWord = segment['wordIndex'] == _currentWordIndex;
-            
-            return TextSpan(
-              text: segment['content'],
-              style: TextStyle(
-                fontWeight: isCurrentWord ? FontWeight.bold : FontWeight.w400,
-                backgroundColor: isCurrentWord ? Colors.orange.withOpacity(0.2) : null,
-                color: const Color(0xFF2D3436),
-              ),
-            );
-          }
-          return const TextSpan(text: '');
-        }).toList(),
       ),
     );
   }
@@ -231,7 +242,6 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
       setState(() {
         _isSpeaking = false;
         _currentWordIndex = -1;
-        _highlightUpdateCounter = 0;
       });
     });
 
@@ -240,7 +250,6 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
       setState(() {
         _isSpeaking = false;
         _currentWordIndex = -1;
-        _highlightUpdateCounter = 0;
       });
     });
 
@@ -258,7 +267,6 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
       setState(() {
         _isSpeaking = false;
         _currentWordIndex = -1;
-        _highlightUpdateCounter = 0;
       });
     } else {
       // Use simple, reliable approach first

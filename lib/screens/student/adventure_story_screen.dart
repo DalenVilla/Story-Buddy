@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import '../../services/gemini_service.dart';
 import '../../services/user_service.dart';
 import 'student_home_screen.dart';
@@ -20,6 +21,7 @@ class AdventureStoryScreen extends StatefulWidget {
 
 class _AdventureStoryScreenState extends State<AdventureStoryScreen> with SingleTickerProviderStateMixin {
   final GeminiService _geminiService = GeminiService();
+  final FlutterTts _flutterTts = FlutterTts();
 
   // Story data
   final List<String> _paragraphs = [];
@@ -29,6 +31,7 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> with Single
   bool _isLoading = true;
   String? _error;
   int _currentSlide = 0; // 0-based index
+  bool _isSpeaking = false;
 
   late AnimationController _loadingController;
   VideoPlayerController? _videoController;
@@ -42,6 +45,7 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> with Single
     );
     _loadingController.repeat(reverse: true);
     _initializeVideoPlayer();
+    _initializeTts();
     _fetchNextPart(); // fetch first slide
   }
 
@@ -53,6 +57,94 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> with Single
         _videoController!.play();
       }
     });
+  }
+
+  Future<void> _initializeTts() async {
+    try {
+      await _flutterTts.setLanguage("en-US");
+      await _flutterTts.setSpeechRate(0.4); // Natural storytelling pace
+      await _flutterTts.setVolume(0.9);
+      await _flutterTts.setPitch(0.9); // Warm, natural pitch
+      
+      print("Adventure TTS initialized successfully");
+    } catch (e) {
+      print("Error initializing Adventure TTS: $e");
+    }
+    
+    _flutterTts.setStartHandler(() {
+      print("Adventure TTS started speaking");
+      setState(() {
+        _isSpeaking = true;
+      });
+    });
+
+    _flutterTts.setCompletionHandler(() {
+      print("Adventure TTS completed speaking");
+      setState(() {
+        _isSpeaking = false;
+      });
+    });
+
+    _flutterTts.setErrorHandler((msg) {
+      print("Adventure TTS error: $msg");
+      setState(() {
+        _isSpeaking = false;
+      });
+    });
+  }
+
+  Future<void> _speakCurrentSlide() async {
+    if (_isSpeaking) {
+      print("Stopping Adventure TTS");
+      await _flutterTts.stop();
+      setState(() {
+        _isSpeaking = false;
+      });
+    } else {
+      if (_currentSlide < _paragraphs.length) {
+        String textToSpeak = _prepareTextForSpeech(_paragraphs[_currentSlide]);
+        
+        print("Speaking adventure slide: ${textToSpeak.substring(0, textToSpeak.length > 50 ? 50 : textToSpeak.length)}...");
+        
+        setState(() {
+          _isSpeaking = true;
+        });
+        
+        try {
+          await _flutterTts.speak(textToSpeak);
+        } catch (e) {
+          print("Error speaking adventure slide: $e");
+          setState(() {
+            _isSpeaking = false;
+          });
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Audio not available: $e'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  String _prepareTextForSpeech(String text) {
+    // Clean and prepare text for natural speech
+    String cleanedText = text
+        .replaceAll('.', '... ')
+        .replaceAll('!', '! ... ')
+        .replaceAll('?', '? ... ')
+        .replaceAll(',', ', ')
+        .replaceAll("don't", "do not")
+        .replaceAll("can't", "cannot")
+        .replaceAll("won't", "will not")
+        .replaceAll("I'm", "I am")
+        .replaceAll("you're", "you are")
+        .replaceAll("it's", "it is")
+        .replaceAll("that's", "that is");
+    
+    return cleanedText.replaceAll(RegExp(r' +'), ' ').trim();
   }
 
   Future<void> _fetchNextPart([String? lastChoice]) async {
@@ -126,6 +218,60 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> with Single
           ),
         ),
         centerTitle: true,
+        actions: [
+          // Big orange audio button for adventure slides
+          if (!_isLoading && _error == null && _paragraphs.isNotEmpty)
+            Container(
+              margin: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.orange.shade400,
+                    Colors.orange.shade600,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.orange.withOpacity(0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: _speakCurrentSlide,
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    child: Center(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: _isSpeaking
+                            ? const Icon(
+                                Icons.stop_rounded,
+                                color: Colors.white,
+                                size: 28,
+                                key: ValueKey('stop'),
+                              )
+                            : const Icon(
+                                Icons.volume_up_rounded,
+                                color: Colors.white,
+                                size: 28,
+                                key: ValueKey('play'),
+                              ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
       body: _isLoading
           ? _buildLoading()
@@ -420,6 +566,7 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> with Single
   void dispose() {
     _loadingController.dispose();
     _videoController?.dispose();
+    _flutterTts.stop();
     super.dispose();
   }
 } 
