@@ -73,18 +73,33 @@ class StorytimeHomeContent extends StatelessWidget {
           Center(
             child: Column(
               children: [
-                const Text(
-                  '📚✨',
-                  style: TextStyle(fontSize: 40),
-                ),
+
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 100,
+                      height: 100,
+                      child: Image.asset(
+                        'lib/assets/floating_monkey.gif',
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Text('🐵', style: TextStyle(fontSize: 24));
+                        },
+                      ),
+                    ),
                 const SizedBox(height: 12),
-                const Text(
-                  'Story Time!',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF6B73FF),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Story Time! 📚✨',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF6B73FF),
+                      ),
+                    ),
+
+                  ],
                 ),
                 const SizedBox(height: 8),
                 Text(
