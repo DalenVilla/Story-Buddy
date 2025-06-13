@@ -53,7 +53,7 @@ class MainScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 // Subtitle
                 Text(
-                  'Interactive storytelling for everyone',
+                  'Interactive storytelling for children!',
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.white.withOpacity(0.9),

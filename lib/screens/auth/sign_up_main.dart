@@ -20,87 +20,93 @@ class SignUpMainScreen extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              // Header with back button
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.white,
-                      ),
+          child: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height - 
+                           MediaQuery.of(context).padding.top,
+              ),
+              child: Column(
+                children: [
+                  // Header with back button
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(
+                            Icons.arrow_back_ios,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              // Content
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: Column(
-                    children: [
-                      const Spacer(flex: 1),
-                      // Title
-                      const Text(
-                        'Join Story Buddy',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Choose your role to get started',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white.withOpacity(0.9),
-                          fontWeight: FontWeight.w300,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const Spacer(flex: 2),
-                      // Student Card
-                      _buildRoleCard(
-                        context,
-                        title: 'I\'m a Student',
-                        description: 'Listen to stories, play games, and learn with AI',
-                        icon: Icons.school,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SignUpStudentScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      // Teacher Card
-                      _buildRoleCard(
-                        context,
-                        title: 'I\'m a Teacher',
-                        description: 'Create stories, manage classes, and track progress',
-                        icon: Icons.person_outline,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SignUpTeacherScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      const Spacer(flex: 2),
-                    ],
                   ),
-                ),
+                  // Content
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 40),
+                        // Title
+                        const Text(
+                          'Join Story Buddy',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Choose your role to get started',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white.withOpacity(0.9),
+                            fontWeight: FontWeight.w300,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 80),
+                        // Student Card
+                        _buildRoleCard(
+                          context,
+                          title: 'I\'m a Student',
+                          description: 'Listen to stories, play games, and learn with AI',
+                          icon: Icons.school,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SignUpStudentScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        // Teacher Card
+                        _buildRoleCard(
+                          context,
+                          title: 'I\'m a Teacher',
+                          description: 'Create stories, manage classes, and track progress',
+                          icon: Icons.person_outline,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SignUpTeacherScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 80),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
