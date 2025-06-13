@@ -456,7 +456,7 @@ class _StoryOnboardingScreenState extends State<StoryOnboardingScreen> {
                       Text(
                         'Create My Story',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),

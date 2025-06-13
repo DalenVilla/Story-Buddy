@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 import '../../services/gemini_service.dart';
+import '../../services/user_service.dart';
+import 'student_home_screen.dart';
 import 'dart:math' as math;
 
 /// Screen that presents a 6-slide choose-your-own-adventure story 📖✨
@@ -28,6 +31,7 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> with Single
   int _currentSlide = 0; // 0-based index
 
   late AnimationController _loadingController;
+  VideoPlayerController? _videoController;
 
   @override
   void initState() {
@@ -37,7 +41,18 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> with Single
       duration: const Duration(seconds: 1),
     );
     _loadingController.repeat(reverse: true);
+    _initializeVideoPlayer();
     _fetchNextPart(); // fetch first slide
+  }
+
+  void _initializeVideoPlayer() {
+    _videoController = VideoPlayerController.asset('lib/assets/solar_loading_state.webm');
+    _videoController!.initialize().then((_) {
+      _videoController!.setLooping(true);
+      if (_isLoading) {
+        _videoController!.play();
+      }
+    });
   }
 
   Future<void> _fetchNextPart([String? lastChoice]) async {
@@ -46,6 +61,9 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> with Single
       _error = null;
     });
     _loadingController.repeat(reverse: true);
+    if (_videoController != null && _videoController!.value.isInitialized) {
+      _videoController!.play();
+    }
 
     try {
       // 1. Get next paragraph + options from Gemini
@@ -74,12 +92,18 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> with Single
         _isLoading = false;
       });
       _loadingController.stop();
+      if (_videoController != null && _videoController!.value.isInitialized) {
+        _videoController!.pause();
+      }
     } catch (e) {
       setState(() {
         _error = e.toString();
         _isLoading = false;
       });
       _loadingController.stop();
+      if (_videoController != null && _videoController!.value.isInitialized) {
+        _videoController!.pause();
+      }
     }
   }
 
@@ -140,18 +164,43 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> with Single
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          AnimatedBuilder(
-            animation: _loadingController,
-            builder: (context, child) {
-              final double offsetY = math.sin(_loadingController.value * 2 * math.pi) * 20;
-              return Transform.translate(
-                offset: Offset(0, offsetY),
-                child: child,
-              );
-            },
-            child: const Text('⭐', style: TextStyle(fontSize: 64)),
-          ),
-          const SizedBox(height: 16),
+          // Video loading animation
+          if (_videoController != null && _videoController!.value.isInitialized)
+            Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF6B73FF).withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: AspectRatio(
+                  aspectRatio: _videoController!.value.aspectRatio,
+                  child: VideoPlayer(_videoController!),
+                ),
+              ),
+            )
+          else
+            // Fallback to star animation while video loads
+            AnimatedBuilder(
+              animation: _loadingController,
+              builder: (context, child) {
+                final double offsetY = math.sin(_loadingController.value * 2 * math.pi) * 20;
+                return Transform.translate(
+                  offset: Offset(0, offsetY),
+                  child: child,
+                );
+              },
+              child: const Text('⭐', style: TextStyle(fontSize: 64)),
+            ),
+          const SizedBox(height: 24),
           const Text(
             'Making magic...',
             style: TextStyle(
@@ -170,7 +219,7 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> with Single
     final imageUrl = _imageUrls[_currentSlide];
     final options = _choicesPerSlide[_currentSlide];
 
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(20.0),
       child: Column(
         children: [
@@ -193,15 +242,56 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> with Single
           ),
           const SizedBox(height: 20),
 
-          // Illustration
+          // Dynamic illustration with soft frame
           if (imageUrl != null)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.network(
-                imageUrl,
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: const Color(0xFF6B73FF).withOpacity(0.2),
+                  width: 2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.15),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: Image.network(
+                  imageUrl,
+                  width: double.infinity,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        color: const Color(0xFF6B73FF).withOpacity(0.05),
+                      ),
+                      alignment: Alignment.center,
+                      child: const CircularProgressIndicator(
+                        color: Color(0xFF6B73FF),
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        color: const Color(0xFF6B73FF).withOpacity(0.05),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text('✨', style: TextStyle(fontSize: 48)),
+                    );
+                  },
+                ),
               ),
             )
           else
@@ -273,10 +363,52 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> with Single
                       color: Color(0xFF6B73FF)),
                 ),
                 const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Back Home'),
-                )
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF6B73FF).withOpacity(0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      // Get current user info to navigate to proper home
+                      final userName = await UserService.getCurrentUserName();
+                      
+                      // Navigate to student home screen and clear entire navigation stack
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) => StorytimeHomeScreen(
+                            studentName: userName ?? 'Student',
+                          ),
+                        ),
+                        (Route<dynamic> route) => false, // Remove ALL previous routes
+                      );
+                    },
+                    icon: const Icon(Icons.home_rounded, size: 22),
+                    label: const Text(
+                      'Back Home',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6B73FF),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
+                  ),
+                ),
               ],
             ),
         ],
@@ -287,6 +419,7 @@ class _AdventureStoryScreenState extends State<AdventureStoryScreen> with Single
   @override
   void dispose() {
     _loadingController.dispose();
+    _videoController?.dispose();
     super.dispose();
   }
 } 
