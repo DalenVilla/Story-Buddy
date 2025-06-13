@@ -24,7 +24,7 @@ class StorytimeHomeContent extends StatelessWidget {
         'bigEmoji': '💪',
         'color': Colors.red,
         'description': 'A tiny mouse becomes super brave!',
-        'image': '🏰', // Castle placeholder
+        'backgroundImage': 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=600&h=300&fit=crop&crop=center',
       },
       {
         'title': 'Lily\'s First Day Adventure',
@@ -33,7 +33,7 @@ class StorytimeHomeContent extends StatelessWidget {
         'bigEmoji': '🧠',
         'color': Colors.blue,
         'description': 'Join Lily\'s exciting new adventure!',
-        'image': '🌈', // Rainbow placeholder
+        'backgroundImage': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=300&fit=crop&crop=center',
       },
       {
         'title': 'The Kindness Tree',
@@ -42,7 +42,7 @@ class StorytimeHomeContent extends StatelessWidget {
         'bigEmoji': '💖',
         'color': Colors.pink,
         'description': 'Watch kindness grow like magic!',
-        'image': '🌸', // Flower placeholder
+        'backgroundImage': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=300&fit=crop&crop=center',
       },
       {
         'title': 'Max and the Friendship Club',
@@ -51,7 +51,7 @@ class StorytimeHomeContent extends StatelessWidget {
         'bigEmoji': '🤝',
         'color': Colors.orange,
         'description': 'Making friends is awesome!',
-        'image': '🎈', // Balloon placeholder
+        'backgroundImage': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=300&fit=crop&crop=center',
       },
       {
         'title': 'The Curious Cat\'s Quest',
@@ -60,7 +60,7 @@ class StorytimeHomeContent extends StatelessWidget {
         'bigEmoji': '🔍',
         'color': Colors.purple,
         'description': 'Explore with the curious cat!',
-        'image': '🚀', // Rocket placeholder
+        'backgroundImage': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=300&fit=crop&crop=center',
       },
     ];
 
@@ -347,124 +347,224 @@ class StorytimeHomeContent extends StatelessWidget {
         // Handle story tap
       },
       child: Container(
-        padding: const EdgeInsets.all(20),
+        height: 160,
         decoration: BoxDecoration(
-          color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: (story['color'] as Color).withOpacity(0.3),
-            width: 2,
-          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.15),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: Row(
-          children: [
-            // Big emoji image placeholder
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: (story['color'] as Color).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: (story['color'] as Color).withOpacity(0.3),
-                  width: 2,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Stack(
+            children: [
+              // Background image
+              Positioned.fill(
+                child: Image.network(
+                  story['backgroundImage'] as String,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      color: (story['color'] as Color).withOpacity(0.3),
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            (story['color'] as Color).withOpacity(0.8),
+                            (story['color'] as Color),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-              child: Center(
-                child: Text(
-                  story['image'] as String,
-                  style: const TextStyle(fontSize: 32),
-                ),
-              ),
-            ),
-            
-            const SizedBox(width: 20),
-            
-            // Story details
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Emotion chip
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: (story['color'] as Color).withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          story['bigEmoji'] as String,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          story['emotion'] as String,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: story['color'] as Color,
-                          ),
-                        ),
+              
+              // Dark overlay for better text readability
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.black.withOpacity(0.3),
+                        Colors.black.withOpacity(0.6),
                       ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
                     ),
                   ),
-                  
-                  const SizedBox(height: 12),
-                  
-                  Text(
-                    story['title'] as String,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2D3436),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 6),
-                  
-                  Text(
-                    story['description'] as String,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-            
-            // Big play button
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: story['color'] as Color,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: (story['color'] as Color).withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
+              
+              // Content overlay
+              Positioned.fill(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    children: [
+                      // Left side - Story info
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Emotion chip with emoji
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    story['bigEmoji'] as String,
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    story['emotion'] as String,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      shadows: [
+                                        Shadow(
+                                          offset: Offset(1, 1),
+                                          blurRadius: 2,
+                                          color: Colors.black,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            
+                            const SizedBox(height: 12),
+                            
+                            // Story title with black outline
+                            Text(
+                              story['title'] as String,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                shadows: [
+                                  Shadow(
+                                    offset: Offset(-1, -1),
+                                    blurRadius: 2,
+                                    color: Colors.black,
+                                  ),
+                                  Shadow(
+                                    offset: Offset(1, -1),
+                                    blurRadius: 2,
+                                    color: Colors.black,
+                                  ),
+                                  Shadow(
+                                    offset: Offset(1, 1),
+                                    blurRadius: 2,
+                                    color: Colors.black,
+                                  ),
+                                  Shadow(
+                                    offset: Offset(-1, 1),
+                                    blurRadius: 2,
+                                    color: Colors.black,
+                                  ),
+                                ],
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            
+                            const SizedBox(height: 8),
+                            
+                            // Story description with black outline
+                            Text(
+                              story['description'] as String,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                                shadows: [
+                                  Shadow(
+                                    offset: Offset(-1, -1),
+                                    blurRadius: 2,
+                                    color: Colors.black,
+                                  ),
+                                  Shadow(
+                                    offset: Offset(1, -1),
+                                    blurRadius: 2,
+                                    color: Colors.black,
+                                  ),
+                                  Shadow(
+                                    offset: Offset(1, 1),
+                                    blurRadius: 2,
+                                    color: Colors.black,
+                                  ),
+                                  Shadow(
+                                    offset: Offset(-1, 1),
+                                    blurRadius: 2,
+                                    color: Colors.black,
+                                  ),
+                                ],
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      const SizedBox(width: 16),
+                      
+                      // Right side - Play button
+                      Container(
+                        width: 70,
+                        height: 70,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.9),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.play_arrow,
+                          color: story['color'] as Color,
+                          size: 36,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-              child: const Icon(
-                Icons.play_arrow,
-                color: Colors.white,
-                size: 32,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
