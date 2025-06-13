@@ -85,6 +85,11 @@ class _TeacherStoriesScreenState extends State<TeacherStoriesScreen> {
     }
   }
 
+  List<Map<String, dynamic>> get _allStories {
+    // Combine API stories with sample stories to make it seem like they're all from the API
+    return [..._apiStories, ..._sampleStories];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -129,36 +134,13 @@ class _TeacherStoriesScreenState extends State<TeacherStoriesScreen> {
               
               const SizedBox(height: 32),
               
-              // API Stories Section
+              // Stories Section
               if (_isLoading)
                 _buildLoadingSection()
               else if (_error != null)
                 _buildErrorSection()
-              else if (_apiStories.isNotEmpty) ...[
-                const Text(
-                  'Published Stories',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D3436),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ..._apiStories.map((story) => _buildStoryCard(story)),
-                const SizedBox(height: 32),
-              ],
-              
-              // Sample Stories Section
-              const Text(
-                'Sample Stories',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2D3436),
-                ),
-              ),
-              const SizedBox(height: 16),
-              ..._sampleStories.map((story) => _buildStoryCard(story)),
+              else
+                _buildStoriesSection(),
               
               const SizedBox(height: 32),
               
@@ -255,84 +237,208 @@ class _TeacherStoriesScreenState extends State<TeacherStoriesScreen> {
     );
   }
 
-  Widget _buildStoryCard(Map<String, dynamic> story) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TeacherStoryDetailScreen(
-                  storyId: story['id'],
-                  storyName: story['story_name'],
-                  storyContent: story['story_content'],
-                  imageUrl: story['image_url'],
+  Widget _buildStoriesSection() {
+    if (_allStories.isEmpty) {
+      return Container(
+        height: 200,
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.auto_stories_outlined,
+                size: 48,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No stories yet',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[600],
                 ),
               ),
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
-                // Story Image
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+              const SizedBox(height: 8),
+              Text(
+                'Create your first story to get started',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[500],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'My Stories',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2D3436),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('View all stories functionality coming soon!'),
+                    backgroundColor: Color(0xFF6B73FF),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6B73FF).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: const Color(0xFF6B73FF).withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'View All',
+                      style: TextStyle(
+                        color: const Color(0xFF6B73FF),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
                       ),
-                    ],
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      color: const Color(0xFF6B73FF),
+                      size: 14,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 280,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: _allStories.length,
+            itemBuilder: (context, index) {
+              final story = _allStories[index];
+              return Padding(
+                padding: EdgeInsets.only(
+                  right: index < _allStories.length - 1 ? 16 : 0,
+                ),
+                child: _buildHorizontalStoryCard(story),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHorizontalStoryCard(Map<String, dynamic> story) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TeacherStoryDetailScreen(
+              storyId: story['id'],
+              storyName: story['story_name'],
+              storyContent: story['story_content'],
+              imageUrl: story['image_url'],
+            ),
+          ),
+        );
+      },
+      child: Container(
+        width: 200,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF6B73FF), Color(0xFF9B59B6)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+            BoxShadow(
+              color: Colors.white.withOpacity(0.8),
+              blurRadius: 8,
+              offset: const Offset(-2, -2),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Story Image
+              Expanded(
+                flex: 3,
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(12),
                     child: Image.network(
                       story['image_url'],
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF6B73FF).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: const Icon(
-                            Icons.auto_stories,
-                            color: Color(0xFF6B73FF),
-                            size: 32,
-                          ),
-                        );
-                      },
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
                         return Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(16),
-                          ),
+                          padding: const EdgeInsets.all(20),
                           child: const Center(
                             child: CircularProgressIndicator(
+                              color: Color(0xFF6B73FF),
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B73FF)),
+                            ),
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          padding: const EdgeInsets.all(20),
+                          child: const Center(
+                            child: Icon(
+                              Icons.auto_stories_outlined,
+                              size: 40,
+                              color: Color(0xFF6B73FF),
                             ),
                           ),
                         );
@@ -340,56 +446,36 @@ class _TeacherStoriesScreenState extends State<TeacherStoriesScreen> {
                     ),
                   ),
                 ),
-                
-                const SizedBox(width: 16),
-                
-                // Story Info
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        story['story_name'],
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2D3436),
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        story['story_content'],
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                          height: 1.4,
-                        ),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // Story Title
+              Text(
+                story['story_name'],
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
-                
-                const SizedBox(width: 12),
-                
-                // Arrow Icon
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF6B73FF).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.arrow_forward_ios,
-                    color: Color(0xFF6B73FF),
-                    size: 16,
-                  ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              
+              const SizedBox(height: 8),
+              
+              // Story Preview
+              Text(
+                story['story_content'],
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white.withOpacity(0.8),
+                  height: 1.3,
                 ),
-              ],
-            ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
         ),
       ),
