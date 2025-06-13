@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../student/student_home_screen.dart'; // TODO: CHANGE THIS
+import '../teacher/teacher_home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,7 +13,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  String _selectedRole = 'student';
+  String _selectedRole = 'teacher';
   bool _isPasswordVisible = false;
   bool _isLoading = false;
 
@@ -52,11 +53,33 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const StorytimeHomeScreen(), // You can create a TeacherDashboard later
+            builder: (context) => const TeacherHomeScreen(),
           ),
         );
       }
     }
+  }
+
+  Future<void> _handleGoogleLogin() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Simulate Google OAuth login delay
+    await Future.delayed(const Duration(seconds: 2));
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    // Navigate to teacher dashboard
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const TeacherHomeScreen(),
+      ),
+    );
   }
 
   @override
@@ -152,32 +175,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                     Expanded(
                                       child: GestureDetector(
                                         onTap: () => setState(() {
-                                          _selectedRole = 'student';
-                                        }),
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(vertical: 12),
-                                          decoration: BoxDecoration(
-                                            color: _selectedRole == 'student'
-                                                ? const Color(0xFF6B73FF)
-                                                : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                          child: Text(
-                                            'Student',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: _selectedRole == 'student'
-                                                  ? Colors.white
-                                                  : Colors.grey[600],
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: GestureDetector(
-                                        onTap: () => setState(() {
                                           _selectedRole = 'teacher';
                                         }),
                                         child: Container(
@@ -201,10 +198,114 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                       ),
                                     ),
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () => setState(() {
+                                          _selectedRole = 'student';
+                                        }),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                          decoration: BoxDecoration(
+                                            color: _selectedRole == 'student'
+                                                ? const Color(0xFF6B73FF)
+                                                : Colors.transparent,
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: Text(
+                                            'Student',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: _selectedRole == 'student'
+                                                  ? Colors.white
+                                                  : Colors.grey[600],
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
                               const SizedBox(height: 24),
+                              
+                              // Show different content based on selected role
+                              if (_selectedRole == 'teacher') ...[
+                                // Google Login Button for Teachers
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 56,
+                                  child: OutlinedButton.icon(
+                                    onPressed: _isLoading ? null : _handleGoogleLogin,
+                                    style: OutlinedButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.grey[700],
+                                      side: BorderSide(color: Colors.grey[300]!, width: 1.5),
+                                      elevation: 0,
+                                      shadowColor: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    icon: Container(
+                                      width: 24,
+                                      height: 24,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Image.network(
+                                        'https://developers.google.com/identity/images/g-logo.png',
+                                        width: 20,
+                                        height: 20,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Icon(Icons.email_outlined, size: 20, color: Colors.grey[600]);
+                                        },
+                                      ),
+                                    ),
+                                    label: const Text(
+                                      'Continue with Google',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                
+                                const SizedBox(height: 24),
+                                
+                                // Divider
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        height: 1,
+                                        color: Colors.grey[300],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                                      child: Text(
+                                        'or sign in with email',
+                                        style: TextStyle(
+                                          color: Colors.grey[500],
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        height: 1,
+                                        color: Colors.grey[300],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                
+                                const SizedBox(height: 24),
+                              ],
+                              
                               // Email Field
                               TextFormField(
                                 controller: _emailController,
