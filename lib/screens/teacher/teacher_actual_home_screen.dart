@@ -223,7 +223,6 @@ class TeacherActualHomeScreen extends StatelessWidget {
       "🤝 Use group storytelling activities to improve collaboration skills.",
       "🎭 Act out story scenes with your students to make reading more interactive.",
       "📝 Have students illustrate their favorite story moments to enhance comprehension.",
-      "🎨 Create story maps together to help students understand plot structure.",
       "🌈 Use different colored pens when writing stories to make the process more fun.",
     ];
     

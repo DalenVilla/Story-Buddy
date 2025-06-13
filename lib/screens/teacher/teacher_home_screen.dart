@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'teacher_dashboard_screen.dart';
 import 'teacher_classes_screen.dart';
 import 'teacher_actual_home_screen.dart';
+import 'teacher_stories_screen.dart';
 
 class TeacherHomeScreen extends StatefulWidget {
   const TeacherHomeScreen({super.key});
@@ -25,7 +26,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
       });
     }),
     const TeacherClassesScreen(),
-    const PlaceholderScreen(title: 'Stories'),
+    const TeacherStoriesScreen(),
     const PlaceholderScreen(title: 'Settings'),
   ];
 
