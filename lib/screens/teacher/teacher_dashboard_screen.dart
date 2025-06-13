@@ -518,6 +518,18 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
         'focusEmotions': _selectedEmotions,
         'students': [], // Empty list for new class
         'createdAt': DateTime.now().toIso8601String(),
+        'stories': 0,
+        'storiesRead': 0,
+        'engagementRate': 'N/A',
+        'averageReadingTime': 'N/A',
+        'popularEmotion': 'N/A',
+        'weeklyProgress': 0,
+        'lastActivity': 'Just created',
+        'achievements': [],
+        'currentStreak': 0,
+        'totalReadingHours': 0.0,
+        'color': Colors.blue, // Default color for new classes
+        'isHardcoded': false,
       };
       
       // Get existing classes

@@ -3,15 +3,11 @@ import 'package:flutter/services.dart';
 import 'view_all_students_screen.dart';
 
 class TeacherClassDetailScreen extends StatefulWidget {
-  final String className;
-  final String grade;
-  final int students;
+  final Map<String, dynamic> classData;
 
   const TeacherClassDetailScreen({
     super.key,
-    required this.className,
-    required this.grade,
-    required this.students,
+    required this.classData,
   });
 
   @override
@@ -35,13 +31,34 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
     {'name': 'Curiosity', 'icon': Icons.search, 'color': Colors.indigo},
   ];
 
+  // Helper getters for class data
+  String get className => widget.classData['name'] ?? 'Unknown Class';
+  String get grade => widget.classData['grade'] ?? 'Unknown Grade';
+  int get studentCount => widget.classData['isHardcoded'] == true 
+      ? (widget.classData['students'] ?? 0) 
+      : (widget.classData['students'] as List?)?.length ?? 0;
+  List<String> get studentsList => widget.classData['isHardcoded'] == true
+      ? List<String>.from(widget.classData['studentsList'] ?? [])
+      : List<String>.from(widget.classData['students'] ?? []);
+  
+  // Stats with defaults for new classes
+  int get storiesRead => widget.classData['storiesRead'] ?? 0;
+  dynamic get engagementRate => widget.classData['engagementRate'] ?? 'N/A';
+  String get averageReadingTime => widget.classData['averageReadingTime'] ?? 'N/A';
+  String get popularEmotion => widget.classData['popularEmotion'] ?? 'N/A';
+  int get weeklyProgress => widget.classData['weeklyProgress'] ?? 0;
+  String get lastActivity => widget.classData['lastActivity'] ?? 'Just created';
+  List<String> get achievements => List<String>.from(widget.classData['achievements'] ?? []);
+  int get currentStreak => widget.classData['currentStreak'] ?? 0;
+  dynamic get totalReadingHours => widget.classData['totalReadingHours'] ?? 0.0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: Text(
-          widget.className,
+          className,
           style: const TextStyle(
             fontWeight: FontWeight.w600,
             color: Colors.white,
@@ -107,7 +124,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Ms. Johnson's ${widget.grade}",
+                      "Ms. Johnson's $grade",
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -116,7 +133,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '${widget.grade} • ${widget.students} students',
+                      '$grade • $studentCount students',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.grey[600],
@@ -268,7 +285,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
             Expanded(
               child: _buildStatCard(
                 icon: Icons.menu_book_outlined,
-                value: '47',
+                value: storiesRead.toString(),
                 label: 'Total Stories\nRead',
                 color: Colors.blue,
               ),
@@ -276,9 +293,9 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildStatCard(
-                icon: Icons.sentiment_very_satisfied,
-                value: 'Joy',
-                label: 'Most Selected\nEmotion',
+                icon: Icons.favorite,
+                value: popularEmotion,
+                label: 'Popular\nEmotion',
                 color: Colors.orange,
               ),
             ),
@@ -290,8 +307,8 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
             Expanded(
               child: _buildStatCard(
                 icon: Icons.timer_outlined,
-                value: '8.5m',
-                label: 'Average Story\nTime',
+                value: averageReadingTime,
+                label: 'Average Reading\nTime',
                 color: Colors.green,
               ),
             ),
@@ -299,7 +316,7 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
             Expanded(
               child: _buildStatCard(
                 icon: Icons.trending_up,
-                value: '94%',
+                value: engagementRate is int ? '${engagementRate}%' : engagementRate.toString(),
                 label: 'Engagement\nRate',
                 color: Colors.purple,
               ),
@@ -364,50 +381,47 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
   }
 
   Widget _buildStudentList() {
-    final allStudents = [
-      {
-        'name': 'Emma S.',
-        'lastStory': 'The Brave Little Fox',
-        'emotions': ['Courage', 'Friendship'],
-        'progress': 4,
-        'maxProgress': 5,
-      },
-      {
-        'name': 'Liam K.',
-        'lastStory': 'Magic Garden Adventure',
-        'emotions': ['Wonder', 'Kindness'],
-        'progress': 3,
-        'maxProgress': 5,
-      },
-      {
-        'name': 'Sophia M.',
-        'lastStory': 'The Helpful Robot',
-        'emotions': ['Empathy', 'Innovation'],
-        'progress': 5,
-        'maxProgress': 5,
-      },
-      {
-        'name': 'Noah P.',
-        'lastStory': 'Journey to the Stars',
-        'emotions': ['Curiosity', 'Perseverance'],
-        'progress': 2,
-        'maxProgress': 5,
-      },
-      {
-        'name': 'Olivia R.',
-        'lastStory': 'The Kind Dragon',
-        'emotions': ['Compassion', 'Courage'],
-        'progress': 4,
-        'maxProgress': 5,
-      },
-      {
-        'name': 'Ethan L.',
-        'lastStory': 'Underwater Mystery',
-        'emotions': ['Discovery', 'Teamwork'],
-        'progress': 3,
-        'maxProgress': 5,
-      },
-    ];
+    final students = studentsList;
+    
+    // For hardcoded classes, create sample data
+    List<Map<String, dynamic>> allStudents = [];
+    if (widget.classData['isHardcoded'] == true && students.isNotEmpty) {
+      final sampleStories = [
+        'The Brave Little Fox',
+        'Magic Garden Adventure', 
+        'The Helpful Robot',
+        'Journey to the Stars',
+        'The Kind Dragon',
+        'Underwater Mystery',
+        'Rainbow Bridge Quest',
+        'Secret Forest Path',
+        'Dancing Butterfly',
+        'Mountain Echo',
+        'Ocean Whispers',
+        'Star Collector'
+      ];
+      
+      final sampleEmotions = [
+        ['Courage', 'Friendship'],
+        ['Wonder', 'Kindness'],
+        ['Empathy', 'Innovation'],
+        ['Curiosity', 'Perseverance'],
+        ['Compassion', 'Courage'],
+        ['Discovery', 'Teamwork']
+      ];
+      
+      allStudents = students.asMap().entries.map((entry) {
+        final index = entry.key;
+        final name = entry.value;
+        return {
+          'name': name,
+          'lastStory': sampleStories[index % sampleStories.length],
+          'emotions': sampleEmotions[index % sampleEmotions.length],
+          'progress': (index % 5) + 1,
+          'maxProgress': 5,
+        };
+      }).toList();
+    }
 
     // Show only first 4 students
     final displayStudents = allStudents.take(4).toList();
@@ -438,8 +452,8 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => ViewAllStudentsScreen(
-                      className: widget.className,
-                      grade: widget.grade,
+                      className: className,
+                      grade: grade,
                     ),
                   ),
                 );
@@ -477,13 +491,15 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
           ],
         ),
         const SizedBox(height: 16),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: displayStudents.length,
-          itemBuilder: (context, index) {
-            final student = displayStudents[index];
-            return Container(
+        displayStudents.isEmpty 
+          ? _buildEmptyStudentState()
+          : ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: displayStudents.length,
+              itemBuilder: (context, index) {
+                final student = displayStudents[index];
+                return Container(
               margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -590,6 +606,50 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildEmptyStudentState() {
+    return Container(
+      padding: const EdgeInsets.all(40),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.people_outline,
+            size: 48,
+            color: Colors.grey[400],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No students yet',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[700],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Students will appear here once they join your class using the class code.',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[500],
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 

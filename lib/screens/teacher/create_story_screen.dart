@@ -34,25 +34,28 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
   // Dynamic classes loaded from local storage
   List<Map<String, dynamic>> _localClasses = [];
   
-  // Hardcoded classes to show alongside local ones
+  // Hardcoded classes to show alongside local ones  
   final List<Map<String, dynamic>> _hardcodedClasses = [
     {
-      'id': 'class_1',
+      'id': 'hardcoded_1',
       'name': 'Morning Reading',
       'grade': '3rd Grade',
-      'students': ['Emma S.', 'Liam K.', 'Sophia M.', 'Noah P.', 'Olivia R.']
+      'studentsList': ['Emma S.', 'Liam K.', 'Sophia M.', 'Noah P.', 'Olivia R.', 'Ava T.', 'Jackson L.', 'Isabella M.', 'Lucas W.', 'Mia R.', 'Ethan C.', 'Charlotte H.'],
+      'students': 12,
     },
     {
-      'id': 'class_2',
+      'id': 'hardcoded_2',
       'name': 'Creative Stories',
       'grade': '4th Grade',
-      'students': ['Alex T.', 'Maya L.', 'James W.', 'Isabella C.', 'Lucas D.']
+      'studentsList': ['Alex T.', 'Maya L.', 'James W.', 'Isabella C.', 'Lucas D.', 'Zoe R.', 'Mason K.', 'Lily P.', 'Oliver S.', 'Grace M.', 'Benjamin F.', 'Chloe A.', 'Henry J.', 'Emma B.', 'Samuel G.'],
+      'students': 15,
     },
     {
-      'id': 'class_3',
+      'id': 'hardcoded_3',
       'name': 'Adventure Tales',
       'grade': '5th Grade',
-      'students': ['Zoe M.', 'Ethan B.', 'Ava H.', 'Mason R.', 'Chloe F.']
+      'studentsList': ['Zoe M.', 'Ethan B.', 'Ava H.', 'Mason R.', 'Chloe F.', 'Noah G.', 'Lily K.', 'Jackson T.', 'Maya S.', 'Oliver L.', 'Grace W.', 'Benjamin M.', 'Emma D.', 'Samuel P.', 'Isabella R.', 'Lucas A.', 'Charlotte J.', 'Henry C.'],
+      'students': 18,
     },
   ];
 
@@ -121,7 +124,7 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
     
     // For hardcoded classes, return the predefined student list
     if (_hardcodedClasses.any((c) => c['id'] == _selectedClass)) {
-      return List<String>.from(classData['students'] ?? []);
+      return List<String>.from(classData['studentsList'] ?? []);
     }
     
     // For locally created classes, return empty list (they start with 0 students)
