@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../../services/gemini_service.dart';
 import 'teacher_story_detail_screen.dart';
 
@@ -143,6 +145,18 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
         // Continue without image
       }
       
+      // Save story to backend
+      try {
+        await _saveStoryToBackend(
+          storyName: storyTitle,
+          storyContent: storyContent,
+          imageUrl: imageUrl ?? 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=300&fit=crop',
+        );
+      } catch (e) {
+        print('Error saving story to backend: $e');
+        // Continue even if backend save fails
+      }
+      
       // Navigate to story detail screen
       if (mounted) {
         Navigator.pushReplacement(
@@ -230,6 +244,34 @@ Written in a warm, nurturing tone that a teacher would use. Make it educational 
     if (_selectedClass == null) return '';
     final classData = _classes.firstWhere((c) => c['id'] == _selectedClass);
     return classData['name'];
+  }
+
+  Future<void> _saveStoryToBackend({
+    required String storyName,
+    required String storyContent,
+    required String imageUrl,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://story-buddy-backend.onrender.com/save_teacher_story'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'story_name': storyName,
+          'story_content': storyContent,
+          'image_url': imageUrl,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Story saved successfully to backend');
+      } else {
+        throw Exception('Failed to save story: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error saving story to backend: $e');
+    }
   }
 
   @override
