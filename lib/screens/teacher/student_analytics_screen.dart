@@ -54,12 +54,7 @@ class _StudentAnalyticsScreenState extends State<StudentAnalyticsScreen> {
           'completed': true,
         },
       ],
-      'monthlyAnalytics': {
-        'joy': 85,
-        'sadness': 20,
-        'anxiety': 15,
-        'anger': 10,
-      },
+
       'totalStoriesRead': 23,
       'averageReadingTime': '15 min',
       'favoriteEmotion': 'Joy',
@@ -110,8 +105,8 @@ class _StudentAnalyticsScreenState extends State<StudentAnalyticsScreen> {
             
             const SizedBox(height: 24),
             
-            // Monthly Analytics
-            _buildMonthlyAnalyticsSection(),
+            // Popular Emotions
+            _buildPopularEmotionsSection(),
             
             const SizedBox(height: 24),
             
@@ -456,8 +451,42 @@ class _StudentAnalyticsScreenState extends State<StudentAnalyticsScreen> {
     );
   }
 
-  Widget _buildMonthlyAnalyticsSection() {
-    final analytics = studentData['monthlyAnalytics'] as Map<String, int>;
+  Widget _buildPopularEmotionsSection() {
+    // Popular emotions data - in a real app this would come from story analysis
+    final popularEmotions = [
+      {
+        'emotion': 'Joy',
+        'emoji': '😊',
+        'count': 12,
+        'percentage': 45,
+        'color': const Color(0xFFFFA726),
+        'description': 'Happy moments in stories'
+      },
+      {
+        'emotion': 'Courage',
+        'emoji': '💪',
+        'count': 8,
+        'percentage': 30,
+        'color': const Color(0xFFEF5350),
+        'description': 'Brave character decisions'
+      },
+      {
+        'emotion': 'Friendship',
+        'emoji': '🤝',
+        'count': 6,
+        'percentage': 22,
+        'color': const Color(0xFF4CAF50),
+        'description': 'Building relationships'
+      },
+      {
+        'emotion': 'Wonder',
+        'emoji': '✨',
+        'count': 4,
+        'percentage': 15,
+        'color': const Color(0xFF9C27B0),
+        'description': 'Curiosity and discovery'
+      },
+    ];
     
     return Container(
       padding: const EdgeInsets.all(20),
@@ -475,75 +504,158 @@ class _StudentAnalyticsScreenState extends State<StudentAnalyticsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Monthly Analytics',
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6B73FF).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  '🎭',
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'Popular Emotions',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D3436),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 8),
+          
+          Text(
+            'Emotions ${widget.studentName} experiences most in stories',
             style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2D3436),
+              fontSize: 14,
+              color: Colors.grey[600],
             ),
           ),
           
           const SizedBox(height: 20),
           
-          // Emotion Analytics
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildEmotionStat('😊', 'Joy', analytics['joy']!, const Color(0xFFFFA726)),
-              _buildEmotionStat('😢', 'Sadness', analytics['sadness']!, const Color(0xFF42A5F5)),
-              _buildEmotionStat('😰', 'Anxiety', analytics['anxiety']!, const Color(0xFFEF5350)),
-              _buildEmotionStat('😠', 'Anger', analytics['anger']!, const Color(0xFFFF7043)),
-            ],
+          // Emotion Cards
+          Column(
+            children: popularEmotions.map((emotion) => _buildEmotionCard(emotion)).toList(),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildEmotionStat(String emoji, String emotion, int value, Color color) {
-    return Column(
-      children: [
-        Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Center(
-            child: Text(
-              emoji,
-              style: const TextStyle(fontSize: 24),
+  Widget _buildEmotionCard(Map<String, dynamic> emotion) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: (emotion['color'] as Color).withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: (emotion['color'] as Color).withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          // Emotion Icon
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: (emotion['color'] as Color).withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: Text(
+                emotion['emoji'],
+                style: const TextStyle(fontSize: 24),
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          emotion,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey[700],
-          ),
-        ),
-        const SizedBox(height: 4),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            '$value%',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: color,
+          
+          const SizedBox(width: 16),
+          
+          // Emotion Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      emotion['emotion'],
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: emotion['color'],
+                      ),
+                    ),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: (emotion['color'] as Color).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '${emotion['count']} times',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: emotion['color'],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  emotion['description'],
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                // Progress Bar
+                Row(
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: emotion['percentage'] / 100.0,
+                          backgroundColor: Colors.grey[200],
+                          valueColor: AlwaysStoppedAnimation<Color>(emotion['color']),
+                          minHeight: 6,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${emotion['percentage']}%',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: emotion['color'],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
