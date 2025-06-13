@@ -70,10 +70,28 @@ class StorytimeHomeContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Welcome message with big friendly text
-          Center(
-            child: Column(
-              children: [
-
+          Stack(
+            children: [
+              // Hanging monkey on the left
+              Positioned(
+                left: -40,
+                top: 0,
+                child: Container(
+                  width: 150,
+                  height: 120,
+                  child: Image.asset(
+                    'lib/assets/hang_monkey.gif',
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Text('🐵', style: TextStyle(fontSize: 20));
+                    },
+                  ),
+                ),
+              ),
+              // Main content centered
+              Center(
+                child: Column(
+                  children: [
                     const SizedBox(width: 8),
                     Container(
                       width: 100,
@@ -86,33 +104,34 @@ class StorytimeHomeContent extends StatelessWidget {
                         },
                       ),
                     ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Story Time! 📚✨',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF6B73FF),
-                      ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'Story Time! 📚✨',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF6B73FF),
+                          ),
+                        ),
+                      ],
                     ),
-
+                    const SizedBox(height: 8),
+                    Text(
+                      'Stories specially picked for your class!',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Stories specially picked for your class!',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
           
           const SizedBox(height: 32),
