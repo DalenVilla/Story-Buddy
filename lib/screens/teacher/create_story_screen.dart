@@ -159,7 +159,7 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
       
       // Navigate to story detail screen
       if (mounted) {
-        Navigator.pushReplacement(
+        final result = await Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => TeacherStoryDetailScreen(
@@ -170,6 +170,11 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
             ),
           ),
         );
+        
+        // If we come back from story detail, pop with refresh signal
+        if (result == 'refresh') {
+          Navigator.pop(context, 'refresh');
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -219,7 +224,7 @@ Please create a story that:
  Shows healthy ways to understand and cope with the focus emotions
 
 
-Use easy words (suitable for 6-year-olds) and short sentences AND 4 paragraphs only
+Use easy words (suitable for 6-year-olds) 1-3 VOWELS ONLY and short sentences AND 4 SHORT paragraphs only
 
 Gently explore why someone might feel: $focusEmotions
 
@@ -233,7 +238,7 @@ Help the character understand or fix the feeling/problem
 
 End with a kind and hopeful message
 
-Avoid narrator text like "Here's your story" — just begin the story
+Avoid narrator text like "Here's your story" — just begin the story AND REMOVE ANY FORMATTING
 
 
 Written in a warm, nurturing tone that a teacher would use. Make it educational yet entertaining, with clear emotional lessons woven throughout, especially focusing on the emotions: $focusEmotions.

@@ -485,13 +485,18 @@ class _TeacherStoriesScreenState extends State<TeacherStoriesScreen> {
 
   Widget _buildCreateStoryButton() {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
+      onTap: () async {
+        final result = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => const CreateStoryScreen(),
           ),
         );
+        
+        // If we get a refresh signal, refresh the stories
+        if (result == 'refresh') {
+          _fetchTeacherStories();
+        }
       },
       child: Container(
         width: double.infinity,

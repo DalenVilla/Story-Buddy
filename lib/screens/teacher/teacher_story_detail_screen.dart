@@ -23,7 +23,7 @@ class TeacherStoryDetailScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF6B73FF)),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(context, 'refresh'),
         ),
         title: Text(
           storyName,
