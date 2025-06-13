@@ -131,7 +131,6 @@ They wish they could change one thing: "${choices[3]}".
 The story should:
 - Be completely original and different from any previous stories
 - Help the child feel seen and understood in their emotion
-- Inspire hope, curiosity, and resilience
 - Include a fun, light touch of fantasy ($selectedMagical)
 - Be written in simple language for a 6-year-old
 - End on a positive, comforting note
@@ -141,11 +140,11 @@ Avoid moralizing or lecturing. Instead, reflect their emotional journey in a met
 Write at a reading level for a 6-year-old:
 - Use simple, age-appropriate words
 - Use short sentences (10 words or fewer)
-- 6 Paragraphs
+- 4 Paragraphs
 - Use gentle and clear ideas they can easily understand
 - No complex metaphors or long dialogue
 - No introduction or explanation — **just return the story only**
-- Use 1-3 syllable words ONLY.
+- Use 1-3 syllable words ONLY. SHORT SENTENCES ONLY.
 
 
 Keep the tone warm, playful, and emotionally supportive.

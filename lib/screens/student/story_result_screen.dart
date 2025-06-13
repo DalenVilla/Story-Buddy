@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import '../../services/gemini_service.dart';
 import '../../models/story.dart';
 import '../../services/story_storage_service.dart';
@@ -23,16 +24,19 @@ class StoryResultScreen extends StatefulWidget {
 
 class _StoryResultScreenState extends State<StoryResultScreen> {
   final GeminiService _geminiService = GeminiService();
+  final FlutterTts _flutterTts = FlutterTts();
   
   String? _imageUrl;
   bool _isGeneratingImage = true;
   String? _imageError;
   bool _storySaved = false;
   bool _isGeneratingTitle = false;
+  bool _isSpeaking = false;
 
   @override
   void initState() {
     super.initState();
+    _initializeTts();
     
     // Only generate new image and save if this is a new story
     if (widget.existingStory == null) {
@@ -45,6 +49,222 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
         _storySaved = true; // Already saved
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _flutterTts.stop();
+    super.dispose();
+  }
+
+  Future<void> _initializeTts() async {
+    try {
+      await _flutterTts.setLanguage("en-US");
+      await _flutterTts.setSpeechRate(0.4); // Natural storytelling pace
+      await _flutterTts.setVolume(0.9);
+      await _flutterTts.setPitch(0.9); // Warm, natural pitch
+      
+      print("TTS initialized successfully");
+    } catch (e) {
+      print("Error initializing TTS: $e");
+    }
+    
+    _flutterTts.setStartHandler(() {
+      print("TTS started speaking");
+      setState(() {
+        _isSpeaking = true;
+      });
+    });
+
+    _flutterTts.setCompletionHandler(() {
+      print("TTS completed speaking");
+      setState(() {
+        _isSpeaking = false;
+      });
+    });
+
+    _flutterTts.setErrorHandler((msg) {
+      print("TTS error: $msg");
+      setState(() {
+        _isSpeaking = false;
+      });
+    });
+  }
+
+  Future<void> _speakStory() async {
+    if (_isSpeaking) {
+      print("Stopping TTS");
+      await _flutterTts.stop();
+      setState(() {
+        _isSpeaking = false;
+      });
+    } else {
+      // Use simple, reliable approach first
+      String storyToSpeak = _prepareSimpleStoryForSpeech(widget.story);
+      
+      // If story is empty or too short, use a test phrase
+      if (storyToSpeak.trim().length < 10) {
+        storyToSpeak = "Hello! This is a test of the story reading feature. Once upon a time, there was a magical story waiting to be told.";
+        print("Using test phrase because story is too short");
+      }
+      
+      print("Speaking story: ${storyToSpeak.substring(0, storyToSpeak.length > 50 ? 50 : storyToSpeak.length)}...");
+      
+      setState(() {
+        _isSpeaking = true;
+      });
+      
+      try {
+        var result = await _flutterTts.speak(storyToSpeak);
+        print("TTS speak result: $result");
+      } catch (e) {
+        print("Error speaking story: $e");
+        setState(() {
+          _isSpeaking = false;
+        });
+        
+        // Show user feedback
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Audio not available: $e'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    }
+  }
+
+  String _prepareSimpleStoryForSpeech(String story) {
+    // Simplified version for maximum compatibility
+    String cleanedStory = _cleanStoryContent(story);
+    
+    print("Original story length: ${story.length}");
+    print("Cleaned story length: ${cleanedStory.length}");
+    
+    if (cleanedStory.isEmpty) {
+      cleanedStory = "Once upon a time, there was a magical story waiting to be told.";
+    }
+    
+    cleanedStory = cleanedStory
+        // Add natural pauses with simple ellipses
+        .replaceAll('.', '... ')
+        .replaceAll('!', '! ... ')
+        .replaceAll('?', '? ... ')
+        .replaceAll(',', ', ')
+        
+        // Expand contractions for clarity
+        .replaceAll("don't", "do not")
+        .replaceAll("can't", "cannot")
+        .replaceAll("won't", "will not")
+        .replaceAll("I'm", "I am")
+        .replaceAll("you're", "you are")
+        .replaceAll("it's", "it is")
+        .replaceAll("that's", "that is")
+        .replaceAll("what's", "what is")
+        .replaceAll("here's", "here is")
+        .replaceAll("there's", "there is");
+    
+    // Clean up extra spaces
+    cleanedStory = cleanedStory.replaceAll(RegExp(r' +'), ' ').trim();
+    
+    print("Final story for TTS: ${cleanedStory.substring(0, cleanedStory.length > 100 ? 100 : cleanedStory.length)}...");
+    
+    return cleanedStory;
+  }
+
+  String _prepareStoryForSpeech(String story) {
+    // Clean the story content first
+    String cleanedStory = _cleanStoryContent(story);
+    
+    // Advanced natural speech processing for human-like delivery
+    cleanedStory = cleanedStory
+        // Story opening with gentle pause
+        .replaceAll(RegExp(r'^(Once upon a time|Long ago|In a|There was|There once)', caseSensitive: false), 
+                   r'\1, ')
+        
+        // Natural sentence endings with varied pauses
+        .replaceAll('.', '. <break time="800ms"/> ')
+        .replaceAll('!', '! <break time="1s"/> ')
+        .replaceAll('?', '? <break time="900ms"/> ')
+        
+        // Breathing pauses for natural flow
+        .replaceAll(',', ', <break time="300ms"/> ')
+        .replaceAll(';', '; <break time="400ms"/> ')
+        
+        // Dramatic storytelling pauses
+        .replaceAll(' and then ', ' <break time="500ms"/> and then <break time="300ms"/> ')
+        .replaceAll(' suddenly ', ' <break time="600ms"/> suddenly <break time="400ms"/> ')
+        .replaceAll(' but ', ' <break time="400ms"/> but ')
+        .replaceAll(' however ', ' <break time="500ms"/> however ')
+        .replaceAll(' meanwhile ', ' <break time="600ms"/> meanwhile <break time="400ms"/> ')
+        
+        // Dialogue with character pauses
+        .replaceAll('"', ' <break time="400ms"/> " ')
+        .replaceAll('" said', '" <break time="300ms"/> said')
+        .replaceAll('" asked', '" <break time="300ms"/> asked')
+        .replaceAll('" replied', '" <break time="300ms"/> replied')
+        
+        // Emotional emphasis
+        .replaceAll(RegExp(r'\b(wow|amazing|wonderful|magical|beautiful)\b', caseSensitive: false), 
+                   r'<emphasis level="moderate">\1</emphasis>')
+        .replaceAll(RegExp(r'\b(scared|frightened|worried|nervous)\b', caseSensitive: false), 
+                   r'<emphasis level="reduced">\1</emphasis>')
+        
+        // Natural pronunciation improvements
+        .replaceAll("don't", "do not")
+        .replaceAll("can't", "can not")
+        .replaceAll("won't", "will not")
+        .replaceAll("shouldn't", "should not")
+        .replaceAll("couldn't", "could not")
+        .replaceAll("wouldn't", "would not")
+        .replaceAll("I'm", "I am")
+        .replaceAll("you're", "you are")
+        .replaceAll("we're", "we are")
+        .replaceAll("they're", "they are")
+        .replaceAll("it's", "it is")
+        .replaceAll("that's", "that is")
+        .replaceAll("what's", "what is")
+        .replaceAll("here's", "here is")
+        .replaceAll("there's", "there is")
+        .replaceAll("let's", "let us")
+        .replaceAll("we'll", "we will")
+        .replaceAll("I'll", "I will")
+        .replaceAll("you'll", "you will")
+        .replaceAll("he'll", "he will")
+        .replaceAll("she'll", "she will")
+        .replaceAll("they'll", "they will")
+        
+        // Number pronunciation
+        .replaceAll("1", "one")
+        .replaceAll("2", "two")
+        .replaceAll("3", "three")
+        .replaceAll("4", "four")
+        .replaceAll("5", "five")
+        .replaceAll("6", "six")
+        .replaceAll("7", "seven")
+        .replaceAll("8", "eight")
+        .replaceAll("9", "nine")
+        .replaceAll("10", "ten")
+        
+        // Special character names and sounds
+        .replaceAll("haha", "ha ha ha")
+        .replaceAll("hehe", "he he he")
+        .replaceAll("hmm", "hmmm")
+        .replaceAll("shh", "shhh")
+        .replaceAll("wow", "<emphasis level=\"strong\">wow</emphasis>")
+        .replaceAll("oh", "<emphasis level=\"moderate\">oh</emphasis>");
+    
+    // Clean up extra spaces but preserve SSML tags
+    cleanedStory = cleanedStory.replaceAll(RegExp(r' +'), ' ').trim();
+    
+    // Wrap in SSML for advanced speech control
+    cleanedStory = '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">'
+                  '<prosody rate="slow" pitch="medium" volume="medium">'
+                  '$cleanedStory'
+                  '</prosody>'
+                  '</speak>';
+    
+    return cleanedStory;
   }
 
   Future<void> _generateStoryImage() async {
@@ -183,6 +403,59 @@ class _StoryResultScreenState extends State<StoryResultScreen> {
           ],
         ),
         centerTitle: true,
+        actions: [
+          // Big orange audio button
+          Container(
+            margin: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.orange.shade400,
+                  Colors.orange.shade600,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.orange.withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: _speakStory,
+                child: Container(
+                  width: 56,
+                  height: 56,
+                  child: Center(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      child: _isSpeaking
+                          ? const Icon(
+                              Icons.stop_rounded,
+                              color: Colors.white,
+                              size: 28,
+                              key: ValueKey('stop'),
+                            )
+                          : const Icon(
+                              Icons.volume_up_rounded,
+                              color: Colors.white,
+                              size: 28,
+                              key: ValueKey('play'),
+                            ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
