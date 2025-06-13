@@ -255,7 +255,9 @@ class _TeacherClassesScreenState extends State<TeacherClassesScreen> {
     final String lastActivity = isHardcoded 
         ? (classData['lastActivity'] ?? 'No activity') 
         : 'Just created';
-    final Color color = classData['color'] ?? Colors.grey;
+    final Color color = classData['color'] is int 
+        ? Color(classData['color']) 
+        : (classData['color'] ?? Colors.grey);
     
     return GestureDetector(
       onTap: () {

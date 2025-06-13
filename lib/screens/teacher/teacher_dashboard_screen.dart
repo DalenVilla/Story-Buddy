@@ -496,13 +496,15 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
   }
 
   String _generateClassCode() {
+
+    return "QWERPA";
     // Generate a simple 6-character class code
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    return String.fromCharCodes(
-      Iterable.generate(6, (index) => chars.codeUnitAt(
-        (DateTime.now().millisecondsSinceEpoch + index) % chars.length
-      ))
-    );
+    // const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    // return String.fromCharCodes(
+    //   Iterable.generate(6, (index) => chars.codeUnitAt(
+    //     (DateTime.now().millisecondsSinceEpoch + index) % chars.length
+    //   ))
+    // );
   }
 
   Future<void> _saveClassToLocal() async {
@@ -528,7 +530,7 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
         'achievements': [],
         'currentStreak': 0,
         'totalReadingHours': 0.0,
-        'color': Colors.blue, // Default color for new classes
+        'color': Colors.blue.value, // Convert Color to int value for JSON serialization
         'isHardcoded': false,
       };
       
