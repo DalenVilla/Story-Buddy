@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'student_analytics_screen.dart';
 
 class ViewAllStudentsScreen extends StatelessWidget {
   final String className;
@@ -193,151 +194,165 @@ class ViewAllStudentsScreen extends StatelessWidget {
               itemCount: students.length,
               itemBuilder: (context, index) {
                 final student = students[index];
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => StudentAnalyticsScreen(
+                          studentName: student['name'] as String,
+                          grade: grade,
+                          className: className,
+                        ),
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 24,
-                            backgroundColor: const Color(0xFF6B73FF).withOpacity(0.1),
-                            child: Text(
-                              student['name'].toString().substring(0, 1),
-                              style: const TextStyle(
-                                color: Color(0xFF6B73FF),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
+                    );
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 24,
+                              backgroundColor: const Color(0xFF6B73FF).withOpacity(0.1),
+                              child: Text(
+                                student['name'].toString().substring(0, 1),
+                                style: const TextStyle(
+                                  color: Color(0xFF6B73FF),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  student['name'] as String,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF2D3436),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    student['name'] as String,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF2D3436),
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'Last active: 2 hours ago',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey[500],
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Last active: 2 hours ago',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[500],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                          _buildProgressIndicator(
-                            student['progress'] as int,
-                            student['maxProgress'] as int,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      
-                      // Last Story
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius: BorderRadius.circular(12),
+                            _buildProgressIndicator(
+                              student['progress'] as int,
+                              student['maxProgress'] as int,
+                            ),
+                          ],
                         ),
-                        child: Row(
+                        const SizedBox(height: 16),
+                        
+                        // Last Story
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[50],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.auto_stories_outlined,
+                                color: Colors.grey[600],
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Last story: ',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  student['lastStory'] as String,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFF2D3436),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 12),
+                        
+                        // Emotions
+                        Row(
                           children: [
-                            Icon(
-                              Icons.auto_stories_outlined,
-                              color: Colors.grey[600],
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
                             Text(
-                              'Last story: ',
+                              'Emotions practiced:',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey[600],
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
+                            const SizedBox(width: 8),
                             Expanded(
-                              child: Text(
-                                student['lastStory'] as String,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Color(0xFF2D3436),
-                                  fontWeight: FontWeight.w600,
-                                ),
+                              child: Wrap(
+                                spacing: 6,
+                                children: (student['emotions'] as List<String>)
+                                    .map((emotion) => Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: _getEmotionColor(emotion).withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(12),
+                                            border: Border.all(
+                                              color: _getEmotionColor(emotion).withOpacity(0.3),
+                                            ),
+                                          ),
+                                          child: Text(
+                                            emotion,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: _getEmotionColor(emotion),
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ))
+                                    .toList(),
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      
-                      const SizedBox(height: 12),
-                      
-                      // Emotions
-                      Row(
-                        children: [
-                          Text(
-                            'Emotions practiced:',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Wrap(
-                              spacing: 6,
-                              children: (student['emotions'] as List<String>)
-                                  .map((emotion) => Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 6,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: _getEmotionColor(emotion).withOpacity(0.1),
-                                          borderRadius: BorderRadius.circular(12),
-                                          border: Border.all(
-                                            color: _getEmotionColor(emotion).withOpacity(0.3),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          emotion,
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: _getEmotionColor(emotion),
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ))
-                                  .toList(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },
@@ -347,8 +362,6 @@ class ViewAllStudentsScreen extends StatelessWidget {
       ),
     );
   }
-
-
 
   Widget _buildProgressIndicator(int progress, int maxProgress) {
     return Column(

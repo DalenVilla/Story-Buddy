@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'view_all_students_screen.dart';
+import 'student_analytics_screen.dart';
 
 class TeacherClassDetailScreen extends StatefulWidget {
   final Map<String, dynamic> classData;
@@ -499,20 +500,33 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
               itemCount: displayStudents.length,
               itemBuilder: (context, index) {
                 final student = displayStudents[index];
-                return Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => StudentAnalyticsScreen(
+                          studentName: student['name'] as String,
+                          grade: grade,
+                          className: className,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -598,7 +612,8 @@ class _TeacherClassDetailScreenState extends State<TeacherClassDetailScreen> {
                   ),
                 ],
               ),
-            );
+                  ),
+                );
           },
         ),
       ],
