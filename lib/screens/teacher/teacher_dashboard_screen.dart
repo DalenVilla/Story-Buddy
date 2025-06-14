@@ -557,14 +557,14 @@ class _CreateClassWizardState extends State<CreateClassWizard> {
             } else {
               studentsField = [];
             }
-            if (!studentsField.contains('Hairth Hayyawi')) {
-              studentsField.add('Hairth Hayyawi');
+            if (!studentsField.contains('Little Timmy')) {
+              studentsField.add('Little Timmy');
             }
             targetClass['students'] = studentsField;
 
             delayedList[index] = targetClass;
             await prefsDelayed.setString('teacher_classes', jsonEncode(delayedList));
-            print('"Hairth Hayyawi" automatically added to class ${targetClass['name']}');
+            print('"Little Timmy" automatically added to class ${targetClass['name']}');
           }
         } catch (e) {
           print('Error adding automatic student: $e');

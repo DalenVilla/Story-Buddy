@@ -327,18 +327,6 @@ class _TeacherClassesScreenState extends State<TeacherClassesScreen> {
                     ],
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF6B73FF).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.arrow_forward_ios,
-                    color: Color(0xFF6B73FF),
-                    size: 16,
-                  ),
-                ),
               ],
             ),
             

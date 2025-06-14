@@ -15,10 +15,11 @@ when teacher goes back to check on my account
 
 ---
 
-Teacher -> Login -> show around (Data, classrooms, etc) -> Make a class 
--> generate story and assign it to the created class
+X Teacher -> Login -> show around (Data, classrooms, etc) -> Make a class 
+X Student -> signs up using code from class -> shows around
+-> Then create your own story (showcase mic option, easy questions) -> Finish it -> go to stories page -> show them adventure story creation ->
+
+X Teacher -> generate story and assign it to me
+show the story that teacher made
 -> FINISHED
 
-Student -> signs up using code from class -> shows around
--> Then create your own story (showcase mic option, easy questions) -> Finish it -> go to stories page -> show the story that teacher made
--> show them adventure story creation 

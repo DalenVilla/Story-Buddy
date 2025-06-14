@@ -331,12 +331,6 @@ class _TeacherStoriesScreenState extends State<TeacherStoriesScreen> {
                         fontSize: 14,
                       ),
                     ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      color: const Color(0xFF6B73FF),
-                      size: 14,
-                    ),
                   ],
                 ),
               ),
