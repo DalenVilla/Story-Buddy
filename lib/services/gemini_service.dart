@@ -9,7 +9,11 @@ class GeminiService {
   // Load API key from environment variable
   static String get _apiKey => dotenv.env['GEM_API'] ?? '';
   static String get _backendApiKey => dotenv.env['BACKEND_API'] ?? '';
-  
+
+// for web demo bruh  
+// static String get _apiKey => const String.fromEnvironment('GEM_API', defaultValue: '');
+// static String get _backendApiKey => const String.fromEnvironment('BACKEND_API', defaultValue: '');
+
   Future<String> generateStory({
     required Map<int, String> choices,
     required String age,
